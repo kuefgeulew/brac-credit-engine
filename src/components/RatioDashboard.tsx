@@ -21,7 +21,6 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { useDemo } from '../context/useDemo'
 import type { MockData } from '../types/mockData'
 
 type ScoreTone = 'success' | 'warning' | 'danger'
@@ -309,7 +308,6 @@ export default function RatioDashboard({
 }: {
   mockData: MockData
 }) {
-  const { highlightCovenantBreach, highlightIcrrScore } = useDemo()
   const { borrowerDetails, regulatory, ratios, financials } = mockData
   const lastYear = financials.years[2] ?? '2024'
 
@@ -409,11 +407,7 @@ export default function RatioDashboard({
       <div className="space-y-10">
       <section>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <div
-            className={`rounded-xl border border-border bg-card-white p-6 text-center shadow-sm ${
-              highlightIcrrScore ? 'demo-highlight-icrr' : ''
-            }`}
-          >
+          <div className="rounded-xl border border-border bg-card-white p-6 text-center shadow-sm">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-text-secondary">
               Internal Credit Risk Rating
             </p>
@@ -652,11 +646,7 @@ export default function RatioDashboard({
       <RatioPrintTable data={mockData} />
 
       <section className="grid grid-cols-1 gap-4 md:grid-cols-2 md:items-stretch">
-        <div
-          className={`flex h-full min-h-0 flex-col rounded-xl border border-border bg-card-white p-6 shadow-sm ${
-            highlightCovenantBreach ? 'demo-highlight-covenant' : ''
-          }`}
-        >
+        <div className="flex h-full min-h-0 flex-col rounded-xl border border-border bg-card-white p-6 shadow-sm">
           <div className="flex items-center gap-2">
             <ShieldCheck className="h-5 w-5 text-primary" strokeWidth={2} aria-hidden />
             <h2 className="text-[15px] font-bold text-text-primary">Covenant Compliance</h2>

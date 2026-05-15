@@ -107,7 +107,7 @@ export default function ProcessingStrip({
     }, 4000)
     const tComplete = window.setTimeout(() => {
       if (!cancelledRef.current) setStage(4)
-    }, 5800)
+    }, 6000)
     const tNavigate = window.setTimeout(() => {
       if (cancelledRef.current) return
       navigate('/results', { state: { firmKey } })

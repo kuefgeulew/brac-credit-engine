@@ -54,34 +54,6 @@ body {
   animation: skeleton-shimmer 1.25s ease-in-out infinite;
 }
 
-@keyframes demo-pulse-glow-red {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 rgba(185, 28, 28, 0.45);
-  }
-  50% {
-    box-shadow: 0 0 0 4px rgba(185, 28, 28, 0.35), 0 0 18px 2px rgba(185, 28, 28, 0.25);
-  }
-}
-
-@keyframes demo-pulse-glow-blue {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 rgba(0, 82, 165, 0.45);
-  }
-  50% {
-    box-shadow: 0 0 0 4px rgba(0, 82, 165, 0.3), 0 0 18px 2px rgba(0, 82, 165, 0.22);
-  }
-}
-
-.demo-highlight-covenant {
-  animation: demo-pulse-glow-red 1.6s ease-in-out infinite;
-}
-
-.demo-highlight-icrr {
-  animation: demo-pulse-glow-blue 1.6s ease-in-out infinite;
-}
-
 /* Scrollbars: main content + sidebar (WebKit + Firefox) */
 .main-scroll,
 .sidebar-scroll {
@@ -191,7 +163,6 @@ body {
 @media print {
   .app-navbar,
   .app-sidebar,
-  .demo-mode-dock,
   .app-minwidth-guard {
     display: none !important;
   }

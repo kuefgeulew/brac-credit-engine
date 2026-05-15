@@ -5,9 +5,10 @@ import {
   Download,
   FileSpreadsheet,
   FileText,
+  Loader2,
   SearchX,
 } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import BorrowerHeaderStrip from '../components/BorrowerHeaderStrip'
 import ExcelExportTab from '../components/ExcelExportTab'
@@ -19,6 +20,7 @@ import { mockData as islam } from '../mockData/islam'
 import { mockData as rrh } from '../mockData/rrh'
 import { mockData as syful } from '../mockData/syful'
 import type { MockData } from '../types/mockData'
+import { generatePDFReport } from '../utils/pdfExporter'
 
 const MOCK_BY_KEY: Record<string, MockData> = {
   aqasem,
@@ -80,6 +82,8 @@ export default function ResultsPage() {
   const location = useLocation()
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState<TabId>('ratios')
+  const [pdfGenerating, setPdfGenerating] = useState(false)
+  const pdfTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const selection = useMemo((): ResultsSelection => {
     const state: unknown = location.state
@@ -87,7 +91,7 @@ export default function ResultsPage() {
       return { kind: 'empty' }
     }
     const firmKey = (state as ResultsLocationState).firmKey!.trim()
-    const selectedData: MockData = MOCK_BY_KEY[firmKey] ?? aqasem
+    const selectedData: MockData = MOCK_BY_KEY[firmKey]
     return { kind: 'ok', selectedData }
   }, [location.state])
 
@@ -101,6 +105,27 @@ export default function ResultsPage() {
       document.title = DEFAULT_DOC_TITLE
     }
   }, [selection])
+
+  const handleDownloadReport = useCallback(() => {
+    if (selection.kind !== 'ok' || pdfGenerating) return
+    const data = selection.selectedData
+    setPdfGenerating(true)
+    if (pdfTimerRef.current) window.clearTimeout(pdfTimerRef.current)
+    pdfTimerRef.current = window.setTimeout(() => {
+      pdfTimerRef.current = null
+      try {
+        generatePDFReport(data)
+      } finally {
+        setPdfGenerating(false)
+      }
+    }, 800)
+  }, [pdfGenerating, selection])
+
+  useEffect(() => {
+    return () => {
+      if (pdfTimerRef.current) window.clearTimeout(pdfTimerRef.current)
+    }
+  }, [])
 
   if (selection.kind === 'empty') {
     return (
@@ -167,10 +192,22 @@ export default function ResultsPage() {
           </div>
           <button
             type="button"
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border-2 border-primary px-4 text-sm font-semibold text-primary transition-colors hover:bg-primary/5"
+            disabled={pdfGenerating}
+            aria-busy={pdfGenerating}
+            onClick={handleDownloadReport}
+            className="inline-flex h-10 min-w-[168px] items-center justify-center gap-2 rounded-lg border-2 border-primary px-4 text-sm font-semibold text-primary transition-colors hover:bg-primary/5 disabled:cursor-not-allowed disabled:opacity-70"
           >
-            <Download className="h-4 w-4" strokeWidth={2} aria-hidden />
-            Download Report
+            {pdfGenerating ? (
+              <>
+                <Loader2 className="h-4 w-4 shrink-0 animate-spin" strokeWidth={2} aria-hidden />
+                Generating...
+              </>
+            ) : (
+              <>
+                <Download className="h-4 w-4 shrink-0" strokeWidth={2} aria-hidden />
+                Download Report
+              </>
+            )}
           </button>
         </div>
       </header>

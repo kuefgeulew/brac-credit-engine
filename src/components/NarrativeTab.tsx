@@ -12,9 +12,9 @@ const SEGMENT_FIELDS = [
   { field: 'taxAlignment' as const, label: 'Tax Alignment' },
 ] as const
 
-function assessmentTone(assessment: MockData['reliabilityScores']['assessment']) {
-  if (assessment === 'High Reliability') return { tone: 'green' as const }
-  if (assessment === 'Moderate Reliability') return { tone: 'amber' as const }
+function assessmentTone(total: number) {
+  if (total >= 75) return { tone: 'green' as const }
+  if (total >= 60) return { tone: 'amber' as const }
   return { tone: 'red' as const }
 }
 
@@ -61,7 +61,10 @@ export default function NarrativeTab({
   const closeToast = useCallback(() => setToastOpen(false), [])
   const { narrative, narrativeSections, reliabilityScores } = mockData
 
-  const band = useMemo(() => assessmentTone(reliabilityScores.assessment), [reliabilityScores.assessment])
+  const band = useMemo(
+    () => assessmentTone(reliabilityScores.total),
+    [reliabilityScores.total],
+  )
 
   const fullNarrativeText = useMemo(() => buildFullNarrativeText(mockData), [mockData])
   const wordCount = useMemo(() => countWords(fullNarrativeText), [fullNarrativeText])

@@ -1,9 +1,7 @@
 import { AlertCircle, Check, ChevronDown, FileText, Upload, X, XCircle } from 'lucide-react'
 import type { ChangeEvent, DragEvent } from 'react'
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import ProcessingStrip from '../components/ProcessingStrip'
-import { useDemo } from '../context/useDemo'
 
 const AUDIT_FIRMS = [
   {
@@ -104,8 +102,6 @@ function StepperLine({ complete }: { complete: boolean }) {
 }
 
 export default function NewReviewPage() {
-  const navigate = useNavigate()
-  const { showProcessingAnimation } = useDemo()
   const listboxId = useId()
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [selectedKey, setSelectedKey] = useState<FirmKey | null>(null)
@@ -237,10 +233,6 @@ export default function NewReviewPage() {
       return
     }
     setRunAnalysisGuardError(false)
-    if (!showProcessingAnimation) {
-      navigate('/results', { state: { firmKey: selectedKey } })
-      return
-    }
     setProcStage(1)
     setIsProcessing(true)
   }

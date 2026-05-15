@@ -1,5 +1,4 @@
 import { Outlet, Route, Routes, useLocation } from 'react-router-dom'
-import DemoModeDock from './components/DemoModeDock'
 import MinWidthGuard from './components/MinWidthGuard'
 import Navbar from './components/Navbar'
 import Sidebar from './components/Sidebar'
@@ -49,8 +48,6 @@ function App() {
           </Route>
         </Routes>
       </div>
-      {/* Available on every route (including login) for stakeholder demo navigation */}
-      <DemoModeDock />
     </>
   )
 }

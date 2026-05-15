@@ -62,7 +62,7 @@ export const mockData: MockData = {
   },
   narrativeSections: {
     executiveSummary:
-      'Dhaka Pharma Industries Ltd. is the strongest credit in the current demo cohort: ICRR 79 (Strong), CRG grade 1, FSS 88, and no covenant or early-warning flags. FY24 revenue reached BDT 318.0M with net profit BDT 45.1M and operating cash flow BDT 28.2M—comfortably above annual debt service with DSCR 1.81×. The company operates a modern Tongi facility with WHO-GMP alignment, diversified hospital formulary contracts, and a growing export toe-hold in West Africa. Reliability scoring is the highest across completeness, consistency, and tax alignment.',
+      'Dhaka Pharma Industries Ltd. is the strongest credit in the current review sample: ICRR 79 (Strong), CRG grade 1, FSS 88, and no covenant or early-warning flags. FY24 revenue reached BDT 318.0M with net profit BDT 45.1M and operating cash flow BDT 28.2M—comfortably above annual debt service with DSCR 1.81×. The company operates a modern Tongi facility with WHO-GMP alignment, diversified hospital formulary contracts, and a growing export toe-hold in West Africa. Reliability scoring is the highest across completeness, consistency, and tax alignment.',
     financialPerformance:
       'Three-year revenue CAGR exceeds 13%, underpinned by mix shift to cardiovascular and anti-diabetic SKUs with structurally higher gross margin (43.6% in FY24 vs 42.5% in FY22). EBITDA margin expanded to 21.2%. Net profit growth of 41.8% over FY22–FY24 reflects operating leverage and disciplined SG&A (22.4% of sales vs 23.5% in FY22). R&D capitalization remains immaterial (<1% of assets); auditor confirmed expensing policy is conservative.',
     liquidityWorkingCapital:

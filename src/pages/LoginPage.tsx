@@ -8,9 +8,16 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [shakeCard, setShakeCard] = useState(false)
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
+    if (!email.trim() || !password.trim()) {
+      setShakeCard(false)
+      requestAnimationFrame(() => setShakeCard(true))
+      window.setTimeout(() => setShakeCard(false), 500)
+      return
+    }
     navigate('/dashboard')
   }
 
@@ -53,7 +60,9 @@ export default function LoginPage() {
       />
 
       <div className="relative z-10 flex min-h-0 w-full flex-1 flex-col items-center justify-center px-4 py-8 md:py-10">
-        <div className="w-full max-w-[440px] rounded-2xl border-t-[3px] border-t-[#0052A5] bg-card-white p-12 shadow-[0_25px_50px_rgba(0,0,0,0.25)]">
+        <div
+          className={`w-full max-w-[440px] rounded-2xl border-t-[3px] border-t-[#0052A5] bg-card-white p-12 shadow-[0_25px_50px_rgba(0,0,0,0.25)] ${shakeCard ? 'login-card-shake' : ''}`}
+        >
           <div className="text-center">
             <div className="flex items-center justify-center gap-2.5">
               <div

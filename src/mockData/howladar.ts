@@ -21,7 +21,7 @@ export const mockData: MockData = {
     debtService: [11200000, 11800000, 12400000],
   },
   ratios: {
-    dscr: [1.48, 1.56, 1.65],
+    dscr: [0.79, 0.61, 1.65],
     currentRatio: [1.15, 1.15, 1.06],
     debtToEquity: [3.0, 3.01, 3.26],
     interestCoverage: [2.1, 2.0, 1.0],

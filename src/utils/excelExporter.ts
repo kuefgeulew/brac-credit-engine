@@ -143,6 +143,18 @@ function sanitizeFilePart(s: string) {
     .slice(0, 48)
 }
 
+/** `YYYYMMDD` from ISO review date `YYYY-MM-DD`, or today if unparsable. */
+function fileStampYyyymmdd(iso: string): string {
+  const head = iso.trim().split('T')[0] ?? ''
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(head)
+  if (m) return `${m[1]}${m[2]}${m[3]}`
+  const d = new Date()
+  const y = d.getFullYear()
+  const mo = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}${mo}${day}`
+}
+
 function currentRatioStatus(v: number) {
   if (v >= 1.5) return 'Healthy'
   if (v >= 1.0) return 'Watch'
@@ -624,23 +636,8 @@ export function generateExcel(data: MockData) {
   XLSX.utils.book_append_sheet(wb, ws5, 'Trend Analysis')
 
   const safeBorrower = sanitizeFilePart(data.borrower)
-  const safeDate = sanitizeFilePart(data.reviewDate)
-  const filename = `CreditReview_${safeBorrower}_${safeDate}.xlsx`
-
-  const expectedSheets = [
-    'Spread Financials',
-    'Ratio Analysis',
-    'ICRR Working Paper',
-    'FSS-CRG Calculation',
-    'Trend Analysis',
-  ] as const
-  if (
-    import.meta.env.DEV &&
-    (wb.SheetNames.length !== expectedSheets.length ||
-      !expectedSheets.every((n, i) => wb.SheetNames[i] === n))
-  ) {
-    console.warn('[excelExporter] Workbook sheet mismatch', wb.SheetNames)
-  }
+  const stamp = fileStampYyyymmdd(data.reviewDate)
+  const filename = `CreditReview_${safeBorrower}_${stamp}.xlsx`
 
   XLSX.writeFile(wb, filename)
 }
