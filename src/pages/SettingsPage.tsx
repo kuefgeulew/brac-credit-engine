@@ -3,14 +3,12 @@ import {
   Building2,
   Info,
   Sliders,
-  User,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import Toast from '../components/Toast'
 
 type SettingsSection =
-  | 'profile'
   | 'notifications'
   | 'audit'
   | 'thresholds'
@@ -21,7 +19,6 @@ const NAV_ITEMS: {
   label: string
   icon: LucideIcon
 }[] = [
-  { id: 'profile', label: 'User Profile', icon: User },
   { id: 'notifications', label: 'Notifications', icon: Bell },
   { id: 'audit', label: 'Audit Firm Templates', icon: Building2 },
   { id: 'thresholds', label: 'Regulatory Thresholds', icon: Sliders },
@@ -156,30 +153,6 @@ function ToggleSwitch({ on }: { on: boolean }) {
   )
 }
 
-function FormField({
-  label,
-  value,
-  type = 'text',
-}: {
-  label: string
-  value: string
-  type?: string
-}) {
-  return (
-    <label className="block">
-      <span className="mb-1.5 block text-sm font-medium text-text-primary">
-        {label}
-      </span>
-      <input
-        type={type}
-        defaultValue={value}
-        readOnly
-        className="h-10 w-full rounded-lg border border-[#D0DCF0] bg-surface px-3 text-sm text-text-primary outline-none focus:border-primary focus:ring-1 focus:ring-primary/30"
-      />
-    </label>
-  )
-}
-
 function InfoBlock({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-lg border border-[#D0DCF0] bg-surface px-4 py-3">
@@ -190,7 +163,7 @@ function InfoBlock({ label, value }: { label: string; value: string }) {
 }
 
 export default function SettingsPage() {
-  const [section, setSection] = useState<SettingsSection>('profile')
+  const [section, setSection] = useState<SettingsSection>('notifications')
   const [toastOpen, setToastOpen] = useState(false)
   const [toastMessage, setToastMessage] = useState('Settings saved')
 
@@ -241,50 +214,6 @@ export default function SettingsPage() {
         </nav>
 
         <div className="min-w-0 flex-1 rounded-xl border border-[#D0DCF0] bg-card-white p-6 shadow-sm">
-          {section === 'profile' ? (
-            <div>
-              <h2 className="text-lg font-bold text-text-primary">User Profile</h2>
-              <div className="mt-6 flex flex-wrap items-start gap-6 border-b border-[#D0DCF0] pb-6">
-                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#0052A5] text-xl font-bold text-card-white">
-                  NH
-                </div>
-                <div>
-                  <p className="text-lg font-bold text-text-primary">Nazia Haque</p>
-                  <p className="mt-0.5 text-sm text-text-secondary">
-                    Senior Credit Analyst
-                  </p>
-                  <p className="mt-1 text-sm text-text-secondary">
-                    Dhaka Corporate Branch
-                  </p>
-                  <p className="mt-2 text-xs text-[#4A5568]">
-                    Employee ID: BRAC-CA-2847
-                  </p>
-                </div>
-              </div>
-              <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <FormField label="Full Name" value="Nazia Haque" />
-                <FormField
-                  label="Email"
-                  value="nazia.haque@bracbank.com"
-                  type="email"
-                />
-                <FormField label="Phone" value="+880 1712 345678" />
-                <FormField label="Department" value="Corporate Credit" />
-                <FormField
-                  label="Branch"
-                  value="Dhaka Corporate Branch"
-                />
-              </div>
-              <button
-                type="button"
-                onClick={() => showToast('Profile updated successfully')}
-                className="mt-6 inline-flex h-10 items-center justify-center rounded-lg bg-primary px-5 text-sm font-bold text-card-white transition-colors hover:bg-primary-dark"
-              >
-                Save Changes
-              </button>
-            </div>
-          ) : null}
-
           {section === 'notifications' ? (
             <div>
               <h2 className="text-lg font-bold text-text-primary">
