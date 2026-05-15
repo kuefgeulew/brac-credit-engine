@@ -20,6 +20,7 @@ import { mockData as islam } from '../mockData/islam'
 import { mockData as rrh } from '../mockData/rrh'
 import { mockData as syful } from '../mockData/syful'
 import type { MockData } from '../types/mockData'
+import { icrrBandClass } from '../utils/icrrBandStyles'
 import { generatePDFReport } from '../utils/pdfExporter'
 
 const MOCK_BY_KEY: Record<string, MockData> = {
@@ -51,23 +52,6 @@ function formatReviewDate(iso: string): string {
     month: 'short',
     year: 'numeric',
   })
-}
-
-function icrrBandBadgeClass(band: string): string {
-  const b = band.trim().toLowerCase()
-  if (b === 'strong') {
-    return 'border-success/40 bg-success/15 text-success'
-  }
-  if (b === 'good') {
-    return 'border-primary bg-primary/10 text-primary'
-  }
-  if (b === 'acceptable') {
-    return 'border-warning/40 bg-warning/15 text-warning'
-  }
-  if (b === 'marginal') {
-    return 'border-danger/40 bg-danger/15 text-danger'
-  }
-  return 'border-border bg-surface text-text-secondary'
 }
 
 function hasValidResultsSelection(state: unknown): state is ResultsLocationState {
@@ -186,7 +170,7 @@ export default function ResultsPage() {
 
         <div className="results-print-actions flex shrink-0 flex-col items-stretch gap-4 sm:flex-row sm:items-center lg:flex-col lg:items-end print:hidden">
           <div
-            className={`inline-flex min-h-[2.75rem] w-full min-w-0 max-w-[min(100%,340px)] items-center justify-center rounded-full border-2 px-6 py-2.5 text-center text-[17px] font-bold leading-snug sm:w-auto sm:min-w-[272px] ${icrrBandBadgeClass(selectedData.regulatory.icrrBand)}`}
+            className={`inline-flex min-h-[2.75rem] w-full min-w-0 max-w-[min(100%,340px)] items-center justify-center rounded-full border-2 px-6 py-2.5 text-center text-[17px] font-bold leading-snug sm:w-auto sm:min-w-[272px] ${icrrBandClass(selectedData.regulatory.icrrBand)}`}
           >
             {icrrLabel}
           </div>

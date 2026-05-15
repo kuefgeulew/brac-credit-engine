@@ -12,6 +12,7 @@ import {
 import { useMemo, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import KPICard from '../components/KPICard'
+import { icrrBandClass } from '../utils/icrrBandStyles'
 import { mockData as aqasem } from '../mockData/aqasem'
 import { mockData as howladar } from '../mockData/howladar'
 import { mockData as islam } from '../mockData/islam'
@@ -101,23 +102,6 @@ function formatReviewDate(iso: string) {
     month: 'short',
     year: 'numeric',
   })
-}
-
-function icrrBandPillClass(band: string) {
-  const b = band.trim().toLowerCase()
-  if (b === 'strong') {
-    return 'border-success/40 bg-success/15 text-success'
-  }
-  if (b === 'good') {
-    return 'border-primary bg-primary/10 text-primary'
-  }
-  if (b === 'acceptable') {
-    return 'border-warning/40 bg-warning/15 text-warning'
-  }
-  if (b === 'marginal') {
-    return 'border-danger/40 bg-danger/15 text-danger'
-  }
-  return 'border-border bg-surface text-text-secondary'
 }
 
 function statusBadgeClass(status: ReviewStatus) {
@@ -510,7 +494,7 @@ export default function DashboardPage() {
                     </td>
                     <td className="px-6 py-3">
                       <span
-                        className={`inline-flex max-w-full items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold ${icrrBandPillClass(row.icrrBand)}`}
+                        className={`inline-flex max-w-full items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold ${icrrBandClass(row.icrrBand)}`}
                       >
                         <span className="truncate">{row.icrrBand}</span>
                         <span className="tabular-nums opacity-90">

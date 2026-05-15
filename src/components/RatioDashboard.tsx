@@ -22,6 +22,7 @@ import {
   YAxis,
 } from 'recharts'
 import type { MockData } from '../types/mockData'
+import { icrrBandBarClass, icrrBandTextClass } from '../utils/icrrBandStyles'
 
 type ScoreTone = 'success' | 'warning' | 'danger'
 
@@ -334,11 +335,11 @@ export default function RatioDashboard({
     netProfit: financials.netProfit[i],
   }))
 
-  const icrrTone = icrrLikeTone(regulatory.icrrScore)
   const fssTone = icrrLikeTone(regulatory.fssScore)
   const crgToneVal = crgTone(regulatory.crgScore)
 
-  const icrrStyles = scoreToneClasses(icrrTone)
+  const icrrTextClass = icrrBandTextClass(regulatory.icrrBand)
+  const icrrBarClass = icrrBandBarClass(regulatory.icrrBand)
   const fssStyles = scoreToneClasses(fssTone)
   const crgStyles = scoreToneClasses(crgToneVal)
 
@@ -411,15 +412,15 @@ export default function RatioDashboard({
             <p className="text-[11px] font-semibold uppercase tracking-wide text-text-secondary">
               Internal Credit Risk Rating
             </p>
-            <p className={`mt-3 text-[48px] font-bold leading-none ${icrrStyles.text}`}>
+            <p className={`mt-3 text-[48px] font-bold leading-none ${icrrTextClass}`}>
               {regulatory.icrrScore}
             </p>
-            <p className={`mt-2 text-base font-semibold ${icrrStyles.text}`}>
+            <p className={`mt-2 text-base font-semibold ${icrrTextClass}`}>
               {regulatory.icrrBand}
             </p>
             <div className="mt-4 h-[6px] w-full overflow-hidden rounded-[3px] bg-border">
               <div
-                className={`h-full rounded-[3px] ${icrrStyles.bar}`}
+                className={`h-full rounded-[3px] ${icrrBarClass}`}
                 style={{ width: `${regulatory.icrrScore}%` }}
               />
             </div>
