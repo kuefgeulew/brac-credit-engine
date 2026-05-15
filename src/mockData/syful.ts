@@ -5,7 +5,7 @@ export const mockData: MockData = {
   auditFirm: 'Syful Alam & Associates',
   reviewDate: '2025-04-14',
   financials: {
-    years: ['2022', '2023', '2024'],
+    years: ['2023', '2024', '2025'],
     revenue: [248000000, 281500000, 318000000],
     costOfSales: [142500000, 160800000, 179200000],
     grossProfit: [105500000, 120700000, 138800000],
@@ -45,11 +45,11 @@ export const mockData: MockData = {
     facilityType: 'Term Loan (minimal — legacy capex) + Working Capital Demand Loan + LC limits',
     facilityLimit: 'BDT 165.0 Million',
     facilityOutstanding: 'BDT 58.5 Million (28.5% utilisation — conservative leverage)',
-    lastReviewDate: '2025-04-14',
-    nextReviewDue: '2026-04-14',
+    lastReviewDate: '2024-04-14',
+    nextReviewDue: '2025-04-14',
     relationshipYears: '11 years',
     collateral:
-      'First mortgage on Tongi plant Block A–C — forced-sale value BDT 210M (Dec 2024); fixed deposit lien BDT 15.0M as cash margin for bid bonds; negative pledge on core brands per facility letter.',
+      'First mortgage on Tongi plant Block A–C — forced-sale value BDT 210M (Dec 2025); fixed deposit lien BDT 15.0M as cash margin for bid bonds; negative pledge on core brands per facility letter.',
   },
   reliabilityScores: {
     completeness: 19,
@@ -62,15 +62,15 @@ export const mockData: MockData = {
   },
   narrativeSections: {
     executiveSummary:
-      'Dhaka Pharma Industries Ltd. is the strongest credit in the current review sample: ICRR 79 (Strong), CRG grade 1, FSS 88, and no covenant or early-warning flags. FY24 revenue reached BDT 318.0M with net profit BDT 45.1M and operating cash flow BDT 28.2M—comfortably above annual debt service with DSCR 1.81×. The company operates a modern Tongi facility with WHO-GMP alignment, diversified hospital formulary contracts, and a growing export toe-hold in West Africa. Reliability scoring is the highest across completeness, consistency, and tax alignment.',
+      'Dhaka Pharma Industries Ltd. is the strongest credit in the current review sample: ICRR 79 (Strong), CRG grade 1, FSS 88, and no covenant or early-warning flags. FY25 revenue reached BDT 318.0M with net profit BDT 45.1M and operating cash flow BDT 28.2M—comfortably above annual debt service with DSCR 1.81×. The company operates a modern Tongi facility with WHO-GMP alignment, diversified hospital formulary contracts, and a growing export toe-hold in West Africa. Reliability scoring is the highest across completeness, consistency, and tax alignment.',
     financialPerformance:
-      'Three-year revenue CAGR exceeds 13%, underpinned by mix shift to cardiovascular and anti-diabetic SKUs with structurally higher gross margin (43.6% in FY24 vs 42.5% in FY22). EBITDA margin expanded to 21.2%. Net profit growth of 41.8% over FY22–FY24 reflects operating leverage and disciplined SG&A (22.4% of sales vs 23.5% in FY22). R&D capitalization remains immaterial (<1% of assets); auditor confirmed expensing policy is conservative.',
+      'Three-year revenue CAGR exceeds 13%, underpinned by mix shift to cardiovascular and anti-diabetic SKUs with structurally higher gross margin (43.6% in FY25 vs 42.5% in FY23). EBITDA margin expanded to 21.2%. Net profit growth of 41.8% over FY23–FY25 reflects operating leverage and disciplined SG&A (22.4% of sales vs 23.5% in FY23). R&D capitalization remains immaterial (<1% of assets); auditor confirmed expensing policy is conservative.',
     liquidityWorkingCapital:
       'Current ratio 2.25× and substantial cash generation provide ample cushion. Operating working capital cycle improved: inventory days stable near 118 (industry norm for regulated batch releases), receivable days 62 with 91% of hospital receivables within 75 days. OCF BDT 28.2M vs debt service BDT 15.6M yields DSCR 1.81×. Unutilised LC lines of BDT 42M support raw material imports without incremental funded exposure.',
     leverageDebt:
-      'Debt-to-equity of 0.80× is low for a pharma manufacturer of this scale; management has deliberately prepaid BDT 12.0M of term debt ahead of schedule in FY24. Interest coverage 9.2× and leverage ratio 0.44× indicate significant headroom for modest incremental borrowing tied to line expansion. No foreign-currency term debt; export receivables largely USD with natural hedge on API imports.',
+      'Debt-to-equity of 0.80× is low for a pharma manufacturer of this scale; management has deliberately prepaid BDT 12.0M of term debt ahead of schedule in FY25. Interest coverage 9.2× and leverage ratio 0.44× indicate significant headroom for modest incremental borrowing tied to line expansion. No foreign-currency term debt; export receivables largely USD with natural hedge on API imports.',
     covenantCompliance:
-      'All covenants in compliance with material cushion: minimum DSCR 1.25× (actual 1.81×), minimum interest coverage 3.0× (actual 9.2×), minimum TNW BDT 95M (actual BDT 155M equity). Quarterly certifications have been filed without exception. Environmental compliance certificates for effluent treatment are current through FY26.',
+      'All covenants in compliance with material cushion: minimum DSCR 1.25× (actual 1.81×), minimum interest coverage 3.0× (actual 9.2×), minimum TNW BDT 95M (actual BDT 155M equity). Quarterly certifications have been filed without exception. Environmental compliance certificates for effluent treatment are current through FY27.',
     riskFlags:
       'Sector-wide pricing pressure on high-volume generics remains a background risk but is mitigated by hospital tender wins and export diversification. No regulatory sanctions or product recalls in the review period. API concentration for two molecules is noted for supply-chain monitoring only—not elevated to early warning.',
     recommendation:

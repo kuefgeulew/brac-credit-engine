@@ -6,6 +6,8 @@ import DashboardPage from './pages/DashboardPage'
 import LoginPage from './pages/LoginPage'
 import NewReviewPage from './pages/NewReviewPage'
 import ResultsPage from './pages/ResultsPage'
+import ReviewQueuePage from './pages/ReviewQueuePage'
+import SettingsPage from './pages/SettingsPage'
 
 function AppShell() {
   const location = useLocation()
@@ -23,15 +25,6 @@ function AppShell() {
   )
 }
 
-function PlaceholderPage({ title }: { title: string }) {
-  return (
-    <div className="p-6">
-      <h1 className="text-xl font-bold text-text-primary">{title}</h1>
-      <p className="mt-2 text-sm text-text-secondary">This section is coming soon.</p>
-    </div>
-  )
-}
-
 function App() {
   return (
     <>
@@ -43,8 +36,8 @@ function App() {
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/new-review" element={<NewReviewPage />} />
             <Route path="/results" element={<ResultsPage />} />
-            <Route path="/review-queue" element={<PlaceholderPage title="Review Queue" />} />
-            <Route path="/settings" element={<PlaceholderPage title="Settings" />} />
+            <Route path="/review-queue" element={<ReviewQueuePage />} />
+            <Route path="/settings" element={<SettingsPage />} />
           </Route>
         </Routes>
       </div>

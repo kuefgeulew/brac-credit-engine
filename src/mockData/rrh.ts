@@ -5,7 +5,7 @@ export const mockData: MockData = {
   auditFirm: 'Rahman Rahman Huq & Co. (KPMG Bangladesh)',
   reviewDate: '2025-04-02',
   financials: {
-    years: ['2022', '2023', '2024'],
+    years: ['2023', '2024', '2025'],
     revenue: [176500000, 198000000, 217250000],
     costOfSales: [142800000, 159200000, 174600000],
     grossProfit: [33700000, 38800000, 42650000],
@@ -34,7 +34,7 @@ export const mockData: MockData = {
     crgScore: 3,
     covenantBreaches: [],
     earlyWarnings: [
-      'Seasonal inventory build ahead of aman harvest increased short-term funded exposure in Q3 FY24.',
+      'Seasonal inventory build ahead of aman harvest increased short-term funded exposure in Q3 FY25.',
     ],
   },
   narrative:
@@ -47,7 +47,7 @@ export const mockData: MockData = {
     facilityType: 'Term Loan (plant) + CC (Hypo) + Warehouse Receipt Financing',
     facilityLimit: 'BDT 92.5 Million',
     facilityOutstanding: 'BDT 71.8 Million (term BDT 38.0M + CC BDT 33.8M)',
-    lastReviewDate: '2025-04-02',
+    lastReviewDate: '2024-04-02',
     nextReviewDue: '2025-10-02',
     relationshipYears: '7 years',
     collateral:
@@ -64,17 +64,17 @@ export const mockData: MockData = {
   },
   narrativeSections: {
     executiveSummary:
-      'Bengal Agro Processing Ltd. is a Jessore-based agro-industrial borrower with FY24 revenue of BDT 217.3M and an Acceptable ICRR (65). The business model is commodity-cyclical: margins compress when domestic paddy prices spike ahead of Boro procurement, then recover through Q1 parboiled rice sales to Dhaka & Khulna distributors. Audited statements (KPMG Bangladesh) are complete; a Moderate reliability score reflects inherent volatility in inventory valuation and seasonal WC spikes rather than material qualification issues.',
+      'Bengal Agro Processing Ltd. is a Jessore-based agro-industrial borrower with FY25 revenue of BDT 217.3M and an Acceptable ICRR (65). The business model is commodity-cyclical: margins compress when domestic paddy prices spike ahead of Boro procurement, then recover through Q1 parboiled rice sales to Dhaka & Khulna distributors. Audited statements (KPMG Bangladesh) are complete; a Moderate reliability score reflects inherent volatility in inventory valuation and seasonal WC spikes rather than material qualification issues.',
     financialPerformance:
-      'Top-line growth of 23% over FY22–FY24 reflects both volume (+11% milled tonnes) and selective price pass-through on branded SKUs. Gross profit improved from BDT 33.7M to BDT 42.7M, though gross margin % dipped slightly in FY23 when diesel and drying costs surged. EBITDA reached BDT 14.5M in FY24; net profit BDT 7.8M represents a thin 3.6% net margin, typical for commodity milling but requiring tight working capital discipline. Debt service coverage improved to 1.38×, only modest headroom above the 1.15× covenant floor.',
+      'Top-line growth of 23% over FY23–FY25 reflects both volume (+11% milled tonnes) and selective price pass-through on branded SKUs. Gross profit improved from BDT 33.7M to BDT 42.7M, though gross margin % dipped slightly in FY24 when diesel and drying costs surged. EBITDA reached BDT 14.5M in FY25; net profit BDT 7.8M represents a thin 3.6% net margin, typical for commodity milling but requiring tight working capital discipline. Debt service coverage improved to 1.38×, only modest headroom above the 1.15× covenant floor.',
     liquidityWorkingCapital:
-      'Current ratio of 1.34× is adequate but not ample for a seasonal borrower. Q3 FY24 saw CC utilisation peak at 94% of sub-limit during pre-harvest inventory build; the bank approved a temporary BDT 6.0M seasonal overlay (since repaid). Operating cash flow of BDT 13.9M vs debt service BDT 10.7M in FY24 is positive; however, Q-o-Q volatility is high—management now provides 13-week cash forecasts monthly during harvest windows.',
+      'Current ratio of 1.34× is adequate but not ample for a seasonal borrower. Q3 FY25 saw CC utilisation peak at 94% of sub-limit during pre-harvest inventory build; the bank approved a temporary BDT 6.0M seasonal overlay (since repaid). Operating cash flow of BDT 13.9M vs debt service BDT 10.7M in FY25 is positive; however, Q-o-Q volatility is high—management now provides 13-week cash forecasts monthly during harvest windows.',
     leverageDebt:
-      'Debt-to-equity of 1.69× (FY24) is elevated versus general manufacturing norms but acceptable for asset-heavy milling where term debt funded the second parboiling line (commissioned FY23). Interest coverage at 3.4× is stable. Term loan residual tenor is 4.2 years with bullet-free amortisation. No related-party on-lending; shareholder advances of BDT 4.2M were fully cleared in FY24.',
+      'Debt-to-equity of 1.69× (FY25) is elevated versus general manufacturing norms but acceptable for asset-heavy milling where term debt funded the second parboiling line (commissioned FY24). Interest coverage at 3.4× is stable. Term loan residual tenor is 4.2 years with bullet-free amortisation. No related-party on-lending; shareholder advances of BDT 4.2M were fully cleared in FY25.',
     covenantCompliance:
-      'No breaches recorded. Covenants include minimum DSCR 1.10×, maximum leverage ratio 0.72×, and minimum stock cover 1.25× on CC. Early-warning flag logged for Q3 funded build—remediated before quarter close. Insurance renewals (fire, machinery breakdown, crop transit) are current through June 2025.',
+      'No breaches recorded. Covenants include minimum DSCR 1.10×, maximum leverage ratio 0.72×, and minimum stock cover 1.25× on CC. Early-warning flag logged for Q3 funded build—remediated before quarter close. Insurance renewals (fire, machinery breakdown, crop transit) are current through June 2026.',
     riskFlags:
-      'Commodity price and weather risk on paddy intake; political disruption on Benapole corridor could delay spice imports. Early-warning: seasonal inventory concentration in Q3. Mitigation includes warehouse receipt financing with third-party surveyor and partial forward sales to institutional buyers. No single distributor exceeds 19% of FY24 domestic sales.',
+      'Commodity price and weather risk on paddy intake; political disruption on Benapole corridor could delay spice imports. Early-warning: seasonal inventory concentration in Q3. Mitigation includes warehouse receipt financing with third-party surveyor and partial forward sales to institutional buyers. No single distributor exceeds 19% of FY25 domestic sales.',
     recommendation:
       'Recommend continuation of facilities at existing limit with six-monthly review cycle until DSCR consistently exceeds 1.35× for four consecutive quarters. Maintain seasonal overlay mechanism. Do not increase term exposure until equity injection of at least BDT 8.0M is evidenced or D/E falls below 1.45× on audited basis.',
   },

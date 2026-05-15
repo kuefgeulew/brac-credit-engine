@@ -5,7 +5,7 @@ export const mockData: MockData = {
   auditFirm: 'Islam Afzal Parsons & Co.',
   reviewDate: '2025-03-29',
   financials: {
-    years: ['2022', '2023', '2024'],
+    years: ['2023', '2024', '2025'],
     revenue: [182000000, 201500000, 223800000],
     costOfSales: [124500000, 137200000, 152600000],
     grossProfit: [57500000, 64300000, 71200000],
@@ -47,8 +47,8 @@ export const mockData: MockData = {
     facilityType: 'Term Loan (tug acquisition) + Revolving CC (bunker & spares)',
     facilityLimit: 'BDT 88.0 Million',
     facilityOutstanding: 'BDT 64.3 Million',
-    lastReviewDate: '2025-03-29',
-    nextReviewDue: '2026-03-29',
+    lastReviewDate: '2024-03-29',
+    nextReviewDue: '2025-03-29',
     relationshipYears: '8 years',
     collateral:
       'Mortgage on office & workshop Patenga — BDT 52M; first priority ship mortgage on MV Padma Lighter-7 (fair market BDT 38M per marine surveyor Jan 2025); assignment of P&I club refunds and key charter contracts.',
