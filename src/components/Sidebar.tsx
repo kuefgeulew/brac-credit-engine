@@ -95,7 +95,7 @@ export default function Sidebar() {
         <div className="shrink-0 border-t border-border bg-card-white p-3">
           <div className="rounded-lg border border-border bg-surface px-3 py-3">
             <p className="text-[11px] font-medium leading-snug text-text-primary">
-              FY2024 Annual Review Cycle
+              FY2025 Annual Review Cycle
             </p>
             <div
               className="mt-2 h-1 w-full overflow-hidden rounded-full bg-border"
@@ -103,7 +103,7 @@ export default function Sidebar() {
               aria-valuenow={68}
               aria-valuemin={0}
               aria-valuemax={100}
-              aria-label="FY2024 review cycle progress"
+              aria-label="FY2025 review cycle progress"
             >
               <div className="h-full w-[68%] rounded-full bg-primary transition-[width] duration-300" />
             </div>

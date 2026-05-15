@@ -136,6 +136,13 @@ function yoyPctDecimal(prev: number, curr: number): number | null {
   return (curr - prev) / prev
 }
 
+/** Abbreviated fiscal-year pair for headers, e.g. FY23→24. */
+function fyShortPair(fromYear: string, toYear: string): string {
+  const a = fromYear.trim().slice(-2)
+  const b = toYear.trim().slice(-2)
+  return `FY${a}→${b}`
+}
+
 function sanitizeFilePart(s: string) {
   return s
     .replace(/[<>:"/\\|?*]/g, '')
@@ -553,10 +560,10 @@ function buildTrendAnalysis(data: MockData): WorkSheet {
     `FY${y0}`,
     `FY${y1}`,
     `FY${y2}`,
-    `Abs Δ ${y0}→${y1}`,
-    `Abs Δ ${y1}→${y2}`,
-    `% Δ ${y0}→${y1}`,
-    `% Δ ${y1}→${y2}`,
+    `Change ${fyShortPair(y0, y1)} (abs)`,
+    `Change ${fyShortPair(y1, y2)} (abs)`,
+    `Change ${fyShortPair(y0, y1)} (%)`,
+    `Change ${fyShortPair(y1, y2)} (%)`,
   ]
   hdr.forEach((h, c) => setCell(ws, headerRow, c, h, 's', styleColHeader))
 

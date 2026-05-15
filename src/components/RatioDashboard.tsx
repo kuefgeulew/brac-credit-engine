@@ -309,7 +309,7 @@ export default function RatioDashboard({
   mockData: MockData
 }) {
   const { borrowerDetails, regulatory, ratios, financials } = mockData
-  const lastYear = financials.years[2] ?? '2024'
+  const lastYear = financials.years[2] ?? '2025'
 
   useEffect(() => {
     const clearPrintMode = () => document.body.classList.remove('print-ratios-on')

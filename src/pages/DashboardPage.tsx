@@ -360,7 +360,7 @@ export default function DashboardPage() {
 
         <div className="rounded-xl border border-border bg-card-white p-6 shadow-sm sm:col-span-2 xl:col-span-4">
           <h2 className="text-base font-bold text-text-primary">
-            Review Cycle Progress — FY2024 Annual Review
+            Review Cycle Progress — FY2025 Annual Review
           </h2>
           <div
             className="mt-4 h-2.5 w-full overflow-hidden rounded-full bg-border"
@@ -368,7 +368,7 @@ export default function DashboardPage() {
             aria-valuenow={68}
             aria-valuemin={0}
             aria-valuemax={100}
-            aria-label="FY2024 review cycle completion"
+            aria-label="FY2025 review cycle completion"
           >
             <div className="h-full w-[68%] rounded-full bg-primary transition-[width] duration-300" />
           </div>
@@ -379,7 +379,7 @@ export default function DashboardPage() {
             <span className="text-text-secondary">128 remaining</span>
           </div>
           <p className="mt-2 text-xs text-text-secondary">
-            Cycle closes: 31 December 2024
+            Cycle closes: 31 December 2025
           </p>
         </div>
       </section>
