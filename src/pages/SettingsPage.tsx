@@ -145,8 +145,8 @@ function ToggleSwitch({ on }: { on: boolean }) {
     >
       <span
         className={[
-          'absolute top-0.5 h-5 w-5 rounded-full bg-card-white shadow transition-transform',
-          on ? 'translate-x-5' : 'translate-x-0.5',
+          'absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-card-white shadow transition-transform',
+          on ? 'translate-x-5' : 'translate-x-0',
         ].join(' ')}
       />
     </button>
