@@ -57,8 +57,12 @@ export default function NarrativeTab({
   mockData: MockData
 }) {
   const [toastOpen, setToastOpen] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [copied, setCopied] = useState(false)
-  const closeToast = useCallback(() => setToastOpen(false), [])
+  const closeToast = useCallback(() => {
+    setToastOpen(false)
+    setIsSubmitting(false)
+  }, [])
   const { narrative, narrativeSections, reliabilityScores } = mockData
 
   const band = useMemo(
@@ -176,8 +180,13 @@ export default function NarrativeTab({
             </button>
             <button
               type="button"
-              onClick={() => setToastOpen(true)}
-              className="inline-flex h-11 items-center justify-center rounded-lg bg-success px-5 text-sm font-bold text-card-white transition-colors hover:bg-success/90"
+              disabled={isSubmitting}
+              onClick={() => {
+                if (isSubmitting) return
+                setIsSubmitting(true)
+                setToastOpen(true)
+              }}
+              className="inline-flex h-11 items-center justify-center rounded-lg bg-success px-5 text-sm font-bold text-card-white transition-colors hover:bg-success/90 disabled:opacity-70 disabled:cursor-not-allowed"
             >
               Approve &amp; Submit
             </button>
