@@ -1,0 +1,252 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-primary: #0052a5;
+  --color-primary-dark: #003d7a;
+  --color-surface: #f4f7fb;
+  --color-card-white: #ffffff;
+  --color-border: #d0dcf0;
+  --color-text-primary: #0d1b3e;
+  --color-text-secondary: #4a5568;
+  --color-success: #1a7c4a;
+  --color-warning: #b45309;
+  --color-danger: #b91c1c;
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol';
+}
+
+body {
+  margin: 0;
+  @apply bg-surface font-sans;
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.page-enter {
+  animation: page-enter 300ms ease-out forwards;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    #e8edf5 0%,
+    #f4f7fb 45%,
+    #e8edf5 90%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.25s ease-in-out infinite;
+}
+
+@keyframes demo-pulse-glow-red {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(185, 28, 28, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(185, 28, 28, 0.35), 0 0 18px 2px rgba(185, 28, 28, 0.25);
+  }
+}
+
+@keyframes demo-pulse-glow-blue {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 82, 165, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(0, 82, 165, 0.3), 0 0 18px 2px rgba(0, 82, 165, 0.22);
+  }
+}
+
+.demo-highlight-covenant {
+  animation: demo-pulse-glow-red 1.6s ease-in-out infinite;
+}
+
+.demo-highlight-icrr {
+  animation: demo-pulse-glow-blue 1.6s ease-in-out infinite;
+}
+
+/* Scrollbars: main content + sidebar (WebKit + Firefox) */
+.main-scroll,
+.sidebar-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #d0dcf0 transparent;
+}
+
+.main-scroll::-webkit-scrollbar,
+.sidebar-scroll::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.main-scroll::-webkit-scrollbar-track,
+.sidebar-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.main-scroll::-webkit-scrollbar-thumb,
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background-color: #d0dcf0;
+  border-radius: 4px;
+}
+
+@keyframes login-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    transform: translateX(-8px);
+  }
+  40%,
+  80% {
+    transform: translateX(8px);
+  }
+}
+
+.login-card-shake {
+  animation: login-shake 0.5s ease-in-out;
+}
+
+/* Ratio print table: never show on screen; print media handled below with body.print-ratios-on */
+.ratio-dashboard-print-only {
+  display: none;
+}
+
+/* Print: Ratio Dashboard tab only (body.print-ratios-on) */
+@media print {
+  body.print-ratios-on * {
+    visibility: hidden;
+  }
+
+  body.print-ratios-on .ratio-dashboard-print-root,
+  body.print-ratios-on .ratio-dashboard-print-root * {
+    visibility: visible;
+  }
+
+  body.print-ratios-on .ratio-dashboard-print-root {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    max-width: none;
+    border: none !important;
+    box-shadow: none !important;
+    background: #ffffff;
+    padding: 16px 24px;
+  }
+
+  body.print-ratios-on .ratio-dashboard-print-only {
+    display: block !important;
+    visibility: visible !important;
+  }
+}
+
+/* Print: narrative memo only (Export as PDF) — body.print-memo-only */
+@media print {
+  body.print-memo-only * {
+    visibility: hidden;
+  }
+
+  body.print-memo-only .memo-print-area,
+  body.print-memo-only .memo-print-area * {
+    visibility: visible;
+  }
+
+  body.print-memo-only .memo-print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    max-height: none !important;
+    overflow: visible !important;
+    background: #ffffff;
+    padding: 24px 32px;
+  }
+
+  body.print-memo-only .narrative-tab-print-only {
+    display: none !important;
+    visibility: hidden !important;
+  }
+}
+
+/* Presentation print: hide app chrome on any print */
+@media print {
+  .app-navbar,
+  .app-sidebar,
+  .demo-mode-dock,
+  .app-minwidth-guard {
+    display: none !important;
+  }
+
+  .app-main {
+    padding-left: 0 !important;
+    padding-top: 0 !important;
+  }
+}
+
+/* Full credit review report (Results page — all tabs in one print) */
+@media print {
+  .results-print-tablist,
+  .results-print-actions {
+    display: none !important;
+  }
+
+  .results-print-doc-title {
+    display: block !important;
+  }
+
+  .results-print-section {
+    display: block !important;
+  }
+
+  .results-print-section-ratios .recharts-responsive-container,
+  .results-print-section-ratios .recharts-wrapper,
+  .results-print-section-ratios svg.recharts-surface {
+    display: none !important;
+  }
+
+  .results-print-root .ratio-dashboard-print-only {
+    display: block !important;
+    visibility: visible !important;
+  }
+
+  .excel-tab-print-only {
+    display: block !important;
+  }
+
+  .narrative-tab-print-only {
+    display: block !important;
+  }
+
+  body:not(.print-memo-only) .results-print-root .narrative-memo-for-screen {
+    display: none !important;
+  }
+
+  .results-print-section-excel {
+    page-break-before: always;
+    break-before: page;
+  }
+
+  .results-print-section-narrative {
+    page-break-before: always;
+    break-before: page;
+  }
+}
