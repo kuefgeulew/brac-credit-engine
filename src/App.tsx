@@ -1,9 +1,8 @@
-import { Outlet, Route, Routes, useLocation } from 'react-router-dom'
+import { Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom'
 import MinWidthGuard from './components/MinWidthGuard'
 import Navbar from './components/Navbar'
 import Sidebar from './components/Sidebar'
 import DashboardPage from './pages/DashboardPage'
-import LoginPage from './pages/LoginPage'
 import NewReviewPage from './pages/NewReviewPage'
 import ResultsPage from './pages/ResultsPage'
 import ReviewQueuePage from './pages/ReviewQueuePage'
@@ -31,8 +30,8 @@ function App() {
       <MinWidthGuard />
       <div className="min-h-screen">
         <Routes>
-          <Route path="/" element={<LoginPage />} />
           <Route element={<AppShell />}>
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/new-review" element={<NewReviewPage />} />
             <Route path="/results" element={<ResultsPage />} />

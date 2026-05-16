@@ -9,6 +9,152 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import KPICard from '../components/KPICard'
 
+type BadgeTone = 'danger' | 'warning' | 'success' | 'primary'
+
+type MockReview = {
+  borrower: string
+  auditFirm: string
+  sector: string
+  reviewDate: string
+  icrrBand: string
+  icrrScore: string
+  crgBand: string
+  crgScore: string
+  icrrTone: BadgeTone
+  crgTone: BadgeTone
+  status: string
+  statusTone: BadgeTone
+  actionLabel: string
+  actionPath?: '/new-review' | '/review-queue'
+}
+
+const MOCK_REVIEWS: MockReview[] = [
+  {
+    borrower: 'Padma Steel Industries Ltd.',
+    auditFirm: 'Rahman Rahman Huq & Co.',
+    sector: 'Steel & Metal',
+    reviewDate: '14 May 2026',
+    icrrBand: 'Acceptable',
+    icrrScore: '68.2',
+    crgBand: 'Good',
+    crgScore: '52/60',
+    icrrTone: 'primary',
+    crgTone: 'success',
+    status: 'Completed',
+    statusTone: 'success',
+    actionLabel: 'View Report',
+  },
+  {
+    borrower: 'Apex Pharmaceuticals Ltd.',
+    auditFirm: 'A. Qasem & Co. Chartered Accountants',
+    sector: 'Pharmaceuticals',
+    reviewDate: '12 May 2026',
+    icrrBand: 'Good',
+    icrrScore: '74.5',
+    crgBand: 'Acceptable',
+    crgScore: '48/60',
+    icrrTone: 'primary',
+    crgTone: 'primary',
+    status: 'Completed',
+    statusTone: 'success',
+    actionLabel: 'View Report',
+  },
+  {
+    borrower: 'Green Delta Logistics Ltd.',
+    auditFirm: 'M/S Howladar Yunus & Co.',
+    sector: 'Transport',
+    reviewDate: '10 May 2026',
+    icrrBand: 'Marginal',
+    icrrScore: '58.3',
+    crgBand: 'Marginal',
+    crgScore: '38/60',
+    icrrTone: 'warning',
+    crgTone: 'warning',
+    status: 'Under Review',
+    statusTone: 'warning',
+    actionLabel: 'Continue',
+    actionPath: '/new-review',
+  },
+  {
+    borrower: 'Bay Fabrics International',
+    auditFirm: 'Syful Shamsul Alam & Co.',
+    sector: 'Textile',
+    reviewDate: '8 May 2026',
+    icrrBand: 'Unacceptable',
+    icrrScore: '47.1',
+    crgBand: 'Special Mention',
+    crgScore: '32/60',
+    icrrTone: 'danger',
+    crgTone: 'warning',
+    status: 'Pending',
+    statusTone: 'primary',
+    actionLabel: 'Assign',
+    actionPath: '/review-queue',
+  },
+  {
+    borrower: 'Northern Agro Processing Co.',
+    auditFirm: 'Islam Afzal Parsons & Co.',
+    sector: 'Agriculture',
+    reviewDate: '5 May 2026',
+    icrrBand: 'Good',
+    icrrScore: '71.8',
+    crgBand: 'Good',
+    crgScore: '50/60',
+    icrrTone: 'primary',
+    crgTone: 'success',
+    status: 'Completed',
+    statusTone: 'success',
+    actionLabel: 'View Report',
+  },
+  {
+    borrower: 'Crystal Ceramics Ltd.',
+    auditFirm: 'Rahman Rahman Huq & Co.',
+    sector: 'Manufacturing',
+    reviewDate: '2 May 2026',
+    icrrBand: 'Unacceptable',
+    icrrScore: '44.6',
+    crgBand: 'Substandard',
+    crgScore: '28/60',
+    icrrTone: 'danger',
+    crgTone: 'danger',
+    status: 'Overdue',
+    statusTone: 'danger',
+    actionLabel: 'Review',
+    actionPath: '/review-queue',
+  },
+  {
+    borrower: 'Meridian Infrastructure Ltd.',
+    auditFirm: 'A. Qasem & Co. Chartered Accountants',
+    sector: 'Construction',
+    reviewDate: '28 Apr 2026',
+    icrrBand: 'Acceptable',
+    icrrScore: '65.4',
+    crgBand: 'Acceptable',
+    crgScore: '46/60',
+    icrrTone: 'primary',
+    crgTone: 'primary',
+    status: 'Completed',
+    statusTone: 'success',
+    actionLabel: 'View Report',
+  },
+  {
+    borrower: 'Coastal Fisheries Export Ltd.',
+    auditFirm: 'M/S Howladar Yunus & Co.',
+    sector: 'Fisheries',
+    reviewDate: '25 Apr 2026',
+    icrrBand: 'Marginal',
+    icrrScore: '61.2',
+    crgBand: 'Marginal',
+    crgScore: '36/60',
+    icrrTone: 'warning',
+    crgTone: 'warning',
+    status: 'Under Review',
+    statusTone: 'warning',
+    actionLabel: 'Continue',
+    actionPath: '/new-review',
+  },
+]
+
 function formatDashboardTimestamp(d: Date) {
   return d.toLocaleString('en-GB', {
     day: 'numeric',
@@ -24,6 +170,20 @@ function timeOfDayGreeting(hour: number): string {
   if (hour < 12) return 'Good morning'
   if (hour < 17) return 'Good afternoon'
   return 'Good evening'
+}
+
+function badgeClasses(tone: BadgeTone) {
+  if (tone === 'success') return 'border-success/30 bg-success/10 text-success'
+  if (tone === 'primary') return 'border-primary/30 bg-primary/10 text-primary'
+  if (tone === 'warning') return 'border-warning/30 bg-warning/10 text-warning'
+  return 'border-danger/30 bg-danger/10 text-danger'
+}
+
+function statusClasses(tone: BadgeTone) {
+  if (tone === 'success') return 'bg-success/15 text-success ring-success/30'
+  if (tone === 'primary') return 'bg-primary/15 text-primary ring-primary/30'
+  if (tone === 'warning') return 'bg-warning/15 text-warning ring-warning/30'
+  return 'bg-danger/15 text-danger ring-danger/30'
 }
 
 export default function DashboardPage() {
@@ -82,25 +242,25 @@ export default function DashboardPage() {
           {timeOfDayGreeting(hourOfDay)}, Nazia.
         </p>
         <p className="mt-1 text-[14px] text-[#4A5568]">
-          You have 1 pending renewal and 1 flagged facility requiring attention.
+          You have 5 pending renewals and 3 flagged facilities requiring attention.
         </p>
       </div>
       <section className="grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <KPICard
           title="Reviews This Month"
-          value={1}
+          value={12}
           subtitle="Compared with prior month"
           icon={FileText}
-          trend="+0%"
+          trend="+8%"
           trendUp
           accent="primary"
         />
         <KPICard
           title="Pending Renewals"
-          value={1}
+          value={5}
           subtitle="Awaiting credit committee"
           icon={Clock}
-          trend="+1"
+          trend="+2"
           trendUp={false}
           accent="warning"
         />
@@ -115,7 +275,7 @@ export default function DashboardPage() {
         />
         <KPICard
           title="Facilities Flagged"
-          value={1}
+          value={3}
           subtitle="Requires follow-up this week"
           icon={AlertTriangle}
           trend="+1"
@@ -171,47 +331,69 @@ export default function DashboardPage() {
               </tr>
             </thead>
             <tbody>
-              <tr className="border-b border-border last:border-b-0 hover:bg-surface/40">
-                <td className="px-6 py-3 font-medium text-text-primary">
-                  Outpace Spinning Mills Ltd.
-                </td>
-                <td className="px-6 py-3 text-text-secondary">
-                  Dewan Nazrul Islam & Co.
-                </td>
-                <td className="px-6 py-3 text-text-secondary">Textile</td>
-                <td className="px-6 py-3 text-text-secondary">
-                  26 Dec 2024
-                </td>
-                <td className="px-6 py-3">
-                  <div className="flex flex-col gap-1">
-                    <span className="inline-flex max-w-max items-center gap-1.5 rounded-full border border-danger/30 bg-danger/10 px-2.5 py-0.5 text-xs font-semibold text-danger">
-                      <span>Unacceptable</span>
-                      <span className="tabular-nums opacity-90">50.5</span>
+              {MOCK_REVIEWS.map((row) => (
+                <tr
+                  key={row.borrower}
+                  className="border-b border-border last:border-b-0 hover:bg-surface/40"
+                >
+                  <td className="px-6 py-3 font-medium text-text-primary">{row.borrower}</td>
+                  <td className="px-6 py-3 text-text-secondary">{row.auditFirm}</td>
+                  <td className="px-6 py-3 text-text-secondary">{row.sector}</td>
+                  <td className="px-6 py-3 text-text-secondary">{row.reviewDate}</td>
+                  <td className="px-6 py-3">
+                    <div className="flex flex-col gap-1">
+                      <span
+                        className={`inline-flex max-w-max items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${badgeClasses(row.icrrTone)}`}
+                      >
+                        <span>{row.icrrBand}</span>
+                        <span className="tabular-nums opacity-90">{row.icrrScore}</span>
+                      </span>
+                      <span
+                        className={`inline-flex max-w-max items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${badgeClasses(row.crgTone)}`}
+                      >
+                        <span>{row.crgBand}</span>
+                        <span className="tabular-nums opacity-90">{row.crgScore}</span>
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-3">
+                    <span
+                      className={`inline-flex rounded-md px-2 py-0.5 text-xs font-semibold ring-1 ${statusClasses(row.statusTone)}`}
+                    >
+                      {row.status}
                     </span>
-                    <span className="inline-flex max-w-max items-center gap-1.5 rounded-full border border-danger/30 bg-danger/10 px-2.5 py-0.5 text-xs font-semibold text-danger">
-                      <span>Substandard</span>
-                      <span className="tabular-nums opacity-90">29/60</span>
-                    </span>
-                  </div>
-                </td>
-                <td className="px-6 py-3">
-                  <span className="inline-flex rounded-md bg-warning/15 px-2 py-0.5 text-xs font-semibold text-warning ring-1 ring-warning/30">
-                    Under Review
-                  </span>
-                </td>
-                <td className="px-6 py-3">
-                  <button
-                    type="button"
-                    onClick={() => navigate('/results', { state: { firmKey: 'osml' } })}
-                    className="rounded-lg bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/20"
-                  >
-                    View Analysis
-                  </button>
-                </td>
-              </tr>
+                  </td>
+                  <td className="px-6 py-3">
+                    <button
+                      type="button"
+                      onClick={() => row.actionPath && navigate(row.actionPath)}
+                      disabled={!row.actionPath}
+                      className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
+                        row.actionPath
+                          ? 'bg-primary/10 text-primary hover:bg-primary/20'
+                          : 'cursor-default bg-surface text-text-secondary'
+                      }`}
+                    >
+                      {row.actionLabel}
+                    </button>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
+
+        <p className="border-t border-border px-6 py-3 text-xs text-text-secondary">
+          Showing {MOCK_REVIEWS.length} of {MOCK_REVIEWS.length} reviews · Upload a new file via{' '}
+          <button
+            type="button"
+            onClick={() => navigate('/new-review')}
+            className="font-semibold text-primary hover:underline"
+          >
+            New Review
+          </button>{' '}
+          to run a live AI analysis demo.
+        </p>
       </section>
     </div>
   )

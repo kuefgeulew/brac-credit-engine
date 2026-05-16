@@ -8,43 +8,179 @@ import {
   Search,
   UserPlus,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+
+type QueueStatus = 'Pending Review' | 'In Progress' | 'Overdue' | 'Completed'
+
+type QueueRow = {
+  priority: number
+  priorityDot: 'danger' | 'warning' | 'primary'
+  borrower: string
+  sector: string
+  facilityM: string
+  analyst: string
+  dueDate: string
+  status: QueueStatus
+  canReview: boolean
+}
+
+const QUEUE_ROWS: QueueRow[] = [
+  {
+    priority: 1,
+    priorityDot: 'danger',
+    borrower: 'Crystal Ceramics Ltd.',
+    sector: 'Manufacturing',
+    facilityM: '1,240',
+    analyst: 'Farhana Afrin',
+    dueDate: '10 May 2026',
+    status: 'Overdue',
+    canReview: true,
+  },
+  {
+    priority: 1,
+    priorityDot: 'danger',
+    borrower: 'Bay Fabrics International',
+    sector: 'Textile',
+    facilityM: '890',
+    analyst: 'Unassigned',
+    dueDate: '14 May 2026',
+    status: 'Pending Review',
+    canReview: true,
+  },
+  {
+    priority: 2,
+    priorityDot: 'warning',
+    borrower: 'Green Delta Logistics Ltd.',
+    sector: 'Transport',
+    facilityM: '2,150',
+    analyst: 'Md. Matiur Rahman',
+    dueDate: '18 May 2026',
+    status: 'In Progress',
+    canReview: true,
+  },
+  {
+    priority: 2,
+    priorityDot: 'warning',
+    borrower: 'Coastal Fisheries Export Ltd.',
+    sector: 'Fisheries',
+    facilityM: '675',
+    analyst: 'Sadia Rahman',
+    dueDate: '20 May 2026',
+    status: 'In Progress',
+    canReview: true,
+  },
+  {
+    priority: 3,
+    priorityDot: 'primary',
+    borrower: 'Padma Steel Industries Ltd.',
+    sector: 'Steel & Metal',
+    facilityM: '4,820',
+    analyst: 'Tanvir Hossain',
+    dueDate: '22 May 2026',
+    status: 'Pending Review',
+    canReview: true,
+  },
+  {
+    priority: 3,
+    priorityDot: 'primary',
+    borrower: 'Northern Agro Processing Co.',
+    sector: 'Agriculture',
+    facilityM: '1,560',
+    analyst: 'Unassigned',
+    dueDate: '24 May 2026',
+    status: 'Pending Review',
+    canReview: true,
+  },
+  {
+    priority: 4,
+    priorityDot: 'primary',
+    borrower: 'Apex Pharmaceuticals Ltd.',
+    sector: 'Pharmaceuticals',
+    facilityM: '3,400',
+    analyst: 'Nazia Haque',
+    dueDate: '8 May 2026',
+    status: 'Completed',
+    canReview: false,
+  },
+  {
+    priority: 5,
+    priorityDot: 'primary',
+    borrower: 'Meridian Infrastructure Ltd.',
+    sector: 'Construction',
+    facilityM: '5,100',
+    analyst: 'Imran Chowdhury',
+    dueDate: '5 May 2026',
+    status: 'Completed',
+    canReview: false,
+  },
+]
+
+const STAT_COUNTS = {
+  pending: QUEUE_ROWS.filter((r) => r.status === 'Pending Review').length,
+  inProgress: QUEUE_ROWS.filter((r) => r.status === 'In Progress').length,
+  overdue: QUEUE_ROWS.filter((r) => r.status === 'Overdue').length,
+  completed: QUEUE_ROWS.filter((r) => r.status === 'Completed').length,
+}
 
 const STAT_CARDS = [
   {
     title: 'Pending Review',
-    value: 0,
+    value: STAT_COUNTS.pending,
     icon: ClipboardList,
     color: 'text-warning',
     bg: 'bg-warning/10',
   },
   {
     title: 'In Progress',
-    value: 1,
+    value: STAT_COUNTS.inProgress,
     icon: Loader2,
     color: 'text-[#0052A5]',
     bg: 'bg-primary/10',
   },
   {
     title: 'Overdue',
-    value: 0,
+    value: STAT_COUNTS.overdue,
     icon: AlertTriangle,
     color: 'text-danger',
     bg: 'bg-danger/10',
   },
   {
     title: 'Completed This Month',
-    value: 0,
+    value: STAT_COUNTS.completed,
     icon: CheckCircle,
     color: 'text-success',
     bg: 'bg-success/10',
   },
 ] as const
 
+function priorityDotClass(tone: QueueRow['priorityDot']) {
+  if (tone === 'danger') return 'bg-danger'
+  if (tone === 'warning') return 'bg-warning'
+  return 'bg-primary'
+}
+
+function statusBadgeClass(status: QueueStatus) {
+  if (status === 'Completed') return 'bg-success/15 text-success'
+  if (status === 'Overdue') return 'bg-danger/15 text-danger'
+  if (status === 'In Progress') return 'bg-primary/15 text-primary'
+  return 'bg-warning/15 text-warning'
+}
+
 export default function ReviewQueuePage() {
   const navigate = useNavigate()
   const [search, setSearch] = useState('')
+
+  const filteredRows = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    if (!q) return QUEUE_ROWS
+    return QUEUE_ROWS.filter(
+      (r) =>
+        r.borrower.toLowerCase().includes(q) ||
+        r.sector.toLowerCase().includes(q) ||
+        r.analyst.toLowerCase().includes(q),
+    )
+  }, [search])
 
   return (
     <div className="p-6">
@@ -125,46 +261,86 @@ export default function ReviewQueuePage() {
               </tr>
             </thead>
             <tbody>
-              <tr className="border-b border-[#D0DCF0] last:border-b-0 transition-colors hover:bg-surface/60">
-                <td className="px-5 py-3.5">
-                  <span className="inline-flex items-center gap-2">
-                    <span
-                      className="h-2.5 w-2.5 shrink-0 rounded-full bg-danger"
-                      aria-hidden
-                    />
-                    <span className="font-medium text-text-primary">1</span>
-                  </span>
-                </td>
-                <td className="px-5 py-3.5 font-medium text-text-primary">
-                  Outpace Spinning Mills Ltd.
-                </td>
-                <td className="px-5 py-3.5 text-text-secondary">Textile</td>
-                <td className="px-5 py-3.5 tabular-nums text-text-primary">
-                  3,135
-                </td>
-                <td className="px-5 py-3.5 text-text-primary">Md. Matiur Rahman</td>
-                <td className="px-5 py-3.5 text-text-secondary">30 Dec 2024</td>
-                <td className="px-5 py-3.5">
-                  <span className="inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold bg-primary/15 text-primary">
-                    In Progress
-                  </span>
-                </td>
-                <td className="px-5 py-3.5">
-                  <button
-                    type="button"
-                    onClick={() => navigate('/results', { state: { firmKey: 'osml' } })}
-                    className="inline-flex h-7 items-center justify-center rounded-md bg-primary px-3 text-xs font-semibold text-card-white transition-colors hover:bg-primary-dark"
+              {filteredRows.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={8}
+                    className="px-5 py-10 text-center text-sm text-text-secondary"
                   >
-                    Review
-                  </button>
-                </td>
-              </tr>
+                    No reviews match your search.
+                  </td>
+                </tr>
+              ) : (
+                filteredRows.map((row) => (
+                  <tr
+                    key={row.borrower}
+                    className="border-b border-[#D0DCF0] last:border-b-0 transition-colors hover:bg-surface/60"
+                  >
+                    <td className="px-5 py-3.5">
+                      <span className="inline-flex items-center gap-2">
+                        <span
+                          className={`h-2.5 w-2.5 shrink-0 rounded-full ${priorityDotClass(row.priorityDot)}`}
+                          aria-hidden
+                        />
+                        <span className="font-medium text-text-primary">{row.priority}</span>
+                      </span>
+                    </td>
+                    <td className="px-5 py-3.5 font-medium text-text-primary">
+                      {row.borrower}
+                    </td>
+                    <td className="px-5 py-3.5 text-text-secondary">{row.sector}</td>
+                    <td className="px-5 py-3.5 tabular-nums text-text-primary">
+                      {row.facilityM}
+                    </td>
+                    <td className="px-5 py-3.5 text-text-primary">{row.analyst}</td>
+                    <td className="px-5 py-3.5 text-text-secondary">{row.dueDate}</td>
+                    <td className="px-5 py-3.5">
+                      <span
+                        className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${statusBadgeClass(row.status)}`}
+                      >
+                        {row.status}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <button
+                        type="button"
+                        onClick={() => row.canReview && navigate('/new-review')}
+                        disabled={!row.canReview}
+                        className={`inline-flex h-7 items-center justify-center rounded-md px-3 text-xs font-semibold transition-colors ${
+                          row.canReview
+                            ? 'bg-primary text-card-white hover:bg-primary-dark'
+                            : 'cursor-default bg-surface text-text-secondary'
+                        }`}
+                      >
+                        {row.canReview ? 'Review' : 'Closed'}
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
 
         <p className="border-t border-[#D0DCF0] px-5 py-3 text-xs text-[#4A5568]">
-          Showing 1 of 1 reviews · Last refreshed: 26 Dec 2024, 12:00 PM
+          Showing {filteredRows.length} of {QUEUE_ROWS.length} reviews · Last refreshed:{' '}
+          {new Date().toLocaleString('en-GB', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true,
+          })}
+          {' · '}
+          <button
+            type="button"
+            onClick={() => navigate('/new-review')}
+            className="font-semibold text-primary hover:underline"
+          >
+            New Review
+          </button>{' '}
+          to run a live upload demo.
         </p>
       </section>
     </div>

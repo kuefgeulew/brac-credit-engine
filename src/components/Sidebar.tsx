@@ -4,7 +4,6 @@ import {
   FilePlus,
   LayoutDashboard,
   Settings,
-  Sparkles,
   X,
 } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
@@ -12,7 +11,6 @@ import { NavLink } from 'react-router-dom'
 
 const navItems = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/osml-analysis', label: 'OSML — Live Demo', icon: Sparkles },
   { to: '/new-review', label: 'New Review', icon: FilePlus },
   { to: '/review-queue', label: 'Review Queue', icon: ClipboardList },
   { to: '/results', label: 'Reports', icon: BarChart3 },
@@ -75,7 +73,7 @@ export default function Sidebar() {
                   <span className="relative z-10 min-w-0 flex-1">{label}</span>
                   {to === '/review-queue' ? (
                     <span className="relative z-10 flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-danger px-1 text-[10px] font-semibold leading-none text-card-white">
-                      3
+                      6
                     </span>
                   ) : null}
                 </>
