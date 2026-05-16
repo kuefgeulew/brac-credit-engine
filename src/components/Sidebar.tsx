@@ -4,6 +4,7 @@ import {
   FilePlus,
   LayoutDashboard,
   Settings,
+  Sparkles,
   X,
 } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
@@ -11,6 +12,7 @@ import { NavLink } from 'react-router-dom'
 
 const navItems = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/osml-analysis', label: 'OSML — Live Demo', icon: Sparkles },
   { to: '/new-review', label: 'New Review', icon: FilePlus },
   { to: '/review-queue', label: 'Review Queue', icon: ClipboardList },
   { to: '/results', label: 'Reports', icon: BarChart3 },

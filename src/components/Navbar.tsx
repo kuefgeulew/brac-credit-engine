@@ -8,6 +8,7 @@ function breadcrumbForPath(pathname: string): string {
   if (pathname === '/results') return 'Dashboard / New Review / Results'
   if (pathname === '/review-queue') return 'Dashboard / Review Queue'
   if (pathname === '/settings') return 'Dashboard / Settings'
+  if (pathname === '/osml-analysis') return 'Dashboard / OSML Analysis'
   return 'Dashboard'
 }
 
