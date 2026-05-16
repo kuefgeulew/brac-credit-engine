@@ -62,7 +62,7 @@ function StripColumn({ icon: Icon, label, value, valueClassName }: StripColumnPr
 export default function BorrowerHeaderStrip({
   details,
 }: {
-  details: MockData['borrowerDetails']
+  details: MockData
 }) {
   const outstandingTone = useMemo(
     () => facilityUtilisationTone(details.facilityLimit, details.facilityOutstanding),

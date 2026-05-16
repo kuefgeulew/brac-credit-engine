@@ -110,7 +110,7 @@ export default function ProcessingStrip({
     }, 6000)
     const tNavigate = window.setTimeout(() => {
       if (cancelledRef.current) return
-      navigate('/results', { state: { firmKey } })
+      navigate('/results', { state: { firmKey: 'osml' } })
     }, 6800)
 
     return () => {

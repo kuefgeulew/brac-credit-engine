@@ -55,9 +55,9 @@ function interestCoverageStatus(v: number): RatioStatus {
   return 'Critical'
 }
 
-function leverageRatioStatus(v: number): RatioStatus {
-  if (v <= 0.6) return 'Healthy'
-  if (v <= 0.75) return 'Watch'
+function returnOnAssetsStatus(v: number): RatioStatus {
+  if (v >= 3.0) return 'Healthy'
+  if (v >= 1.5) return 'Watch'
   return 'Critical'
 }
 
@@ -73,7 +73,6 @@ function regulatoryRgb(score: number): [number, number, number] {
   return [239, 68, 68]
 }
 
-/** CRG scale 1–5 (lower grade number = better). */
 function crgGradeFill(crg: number): [number, number, number] {
   if (crg <= 2) return [34, 197, 94]
   if (crg === 3) return [245, 158, 11]
@@ -105,6 +104,7 @@ function fileStampFromReviewIso(iso: string): string {
 
 function formatReviewDateIso(iso: string): string {
   const d = new Date(iso + 'T00:00:00')
+  if (Number.isNaN(d.getTime())) return iso
   return d.toLocaleDateString('en-GB', {
     day: 'numeric',
     month: 'short',
@@ -161,9 +161,6 @@ function drawScoreBox(
   doc.setTextColor(0, 0, 0)
 }
 
-/**
- * Builds a multi-page credit review PDF and triggers download in the browser.
- */
 export function generatePDFReport(data: MockData): void {
   const doc = new jsPDF({ unit: 'mm', format: 'a4' })
   const pageW = doc.internal.pageSize.getWidth()
@@ -177,8 +174,7 @@ export function generatePDFReport(data: MockData): void {
     second: '2-digit',
     hour12: true,
   })
-  const { financials, ratios, regulatory, borrowerDetails, narrativeSections, reliabilityScores } =
-    data
+  const { financials, ratios } = data
   const [y0, y1, y2] = financials.years
 
   /* ----- PAGE 1 COVER ----- */
@@ -216,10 +212,10 @@ export function generatePDFReport(data: MockData): void {
 
   const leftBlock: [string, string][] = [
     ['Audit Firm', data.auditFirm],
-    ['Sector', borrowerDetails.sector],
-    ['Facility Type', borrowerDetails.facilityType],
-    ['Facility Limit', borrowerDetails.facilityLimit],
-    ['Outstanding', borrowerDetails.facilityOutstanding],
+    ['Sector', data.sector],
+    ['Facility Type', data.facilityType],
+    ['Facility Limit', data.facilityLimit],
+    ['Outstanding', data.facilityOutstanding],
   ]
   for (const [lab, val] of leftBlock) {
     doc.setFont('helvetica', 'bold')
@@ -232,11 +228,11 @@ export function generatePDFReport(data: MockData): void {
   }
   y += 3
   const rightBlock: [string, string][] = [
-    ['Review Date', formatReviewDateIso(data.reviewDate)],
-    ['ICRR Score', String(regulatory.icrrScore)],
-    ['ICRR Band', regulatory.icrrBand],
-    ['FSS Score', String(regulatory.fssScore)],
-    ['CRG Score', String(regulatory.crgScore)],
+    ['Review Date', formatReviewDateIso(data.dateOfAnalysis)],
+    ['ICRR Score', '50.5'],
+    ['ICRR Band', 'Unacceptable'],
+    ['FSS Score', '42'],
+    ['CRG Score', '29'],
   ]
   for (const [lab, val] of rightBlock) {
     doc.setFont('helvetica', 'bold')
@@ -288,23 +284,24 @@ export function generatePDFReport(data: MockData): void {
   }
 
   pushGroup('INCOME STATEMENT')
-  pushRow('Revenue', ...financials.revenue)
-  pushRow('Cost of Sales', ...financials.costOfSales)
-  pushRow('Gross Profit', ...financials.grossProfit)
-  pushRow('Operating Expenses', ...financials.operatingExpenses)
-  pushRow('EBITDA', ...financials.ebitda)
-  pushRow('Net Profit', ...financials.netProfit)
+  pushRow('Revenue', ...(financials.incomeStatement.revenue as [number, number, number]))
+  pushRow('Cost of Goods Sold', ...(financials.incomeStatement.costOfGoodsSold as [number, number, number]))
+  pushRow('Gross Profit', ...(financials.incomeStatement.grossProfit as [number, number, number]))
+  pushRow('Operating Expenses', ...(financials.incomeStatement.operatingExpenses as [number, number, number]))
+  pushRow('EBIT', ...(financials.incomeStatement.ebit as [number, number, number]))
+  pushRow('Net Profit', ...(financials.incomeStatement.netProfit as [number, number, number]))
 
   pushGroup('BALANCE SHEET')
-  pushRow('Total Assets', ...financials.totalAssets)
-  pushRow('Total Liabilities', ...financials.totalLiabilities)
-  pushRow('Equity', ...financials.equity)
-  pushRow('Current Assets', ...financials.currentAssets)
-  pushRow('Current Liabilities', ...financials.currentLiabilities)
+  pushRow('Total Assets', ...(financials.balanceSheet.totalAssets as [number, number, number]))
+  pushRow('Total Liabilities', ...(financials.balanceSheet.totalLiabilities as [number, number, number]))
+  pushRow('Equity', ...(financials.balanceSheet.totalEquity as [number, number, number]))
+  pushRow('Current Assets', ...(financials.balanceSheet.totalCurrentAssets as [number, number, number]))
+  pushRow('Current Liabilities', ...(financials.balanceSheet.totalCurrentLiab as [number, number, number]))
 
   pushGroup('CASH FLOW')
-  pushRow('Operating Cash Flow', ...financials.operatingCF)
-  pushRow('Debt Service', ...financials.debtService)
+  pushRow('Operating Cash Flow', ...(financials.cashFlow.operatingCF as [number, number, number]))
+  pushRow('Investing Cash Flow', ...(financials.cashFlow.investingCF as [number, number, number]))
+  pushRow('Financing Cash Flow', ...(financials.cashFlow.financingCF as [number, number, number]))
 
   autoTable(doc, {
     startY: y,
@@ -362,11 +359,11 @@ export function generatePDFReport(data: MockData): void {
       interestCoverageStatus(ratios.interestCoverage[2]),
     ],
     [
-      'Leverage',
-      formatRatio2(ratios.leverageRatio[0]),
-      formatRatio2(ratios.leverageRatio[1]),
-      formatRatio2(ratios.leverageRatio[2]),
-      leverageRatioStatus(ratios.leverageRatio[2]),
+      'Return on Assets',
+      formatRatio2(ratios.returnOnAssets[0]),
+      formatRatio2(ratios.returnOnAssets[1]),
+      formatRatio2(ratios.returnOnAssets[2]),
+      returnOnAssetsStatus(ratios.returnOnAssets[2]),
     ],
   ]
 
@@ -397,9 +394,9 @@ export function generatePDFReport(data: MockData): void {
   const boxH = 22
   const boxX = margin + 105
   let boxY = y + 2
-  const icrrRgb = regulatoryRgb(regulatory.icrrScore)
-  const fssRgb = regulatoryRgb(regulatory.fssScore)
-  const crgFill = crgGradeFill(regulatory.crgScore)
+  const icrrRgb = regulatoryRgb(50.5)
+  const fssRgb = regulatoryRgb(42)
+  const crgFill = crgGradeFill(4)
 
   drawScoreBox(
     doc,
@@ -408,13 +405,13 @@ export function generatePDFReport(data: MockData): void {
     boxW,
     boxH,
     'ICRR',
-    `${regulatory.icrrScore} — ${regulatory.icrrBand}`,
+    `50.5 — Unacceptable`,
     icrrRgb,
   )
   boxY += boxH + 4
-  drawScoreBox(doc, boxX, boxY, boxW, boxH, 'FSS', `${regulatory.fssScore} / 100`, fssRgb)
+  drawScoreBox(doc, boxX, boxY, boxW, boxH, 'FSS', `42 / 100`, fssRgb)
   boxY += boxH + 4
-  drawScoreBox(doc, boxX, boxY, boxW, boxH, 'CRG', `Grade ${regulatory.crgScore} (1–5)`, crgFill)
+  drawScoreBox(doc, boxX, boxY, boxW, boxH, 'CRG', `Grade 29 (Substandard)`, crgFill)
 
   /* ----- PAGE 4+ NARRATIVE ----- */
   doc.addPage()
@@ -426,21 +423,21 @@ export function generatePDFReport(data: MockData): void {
   y += 2
   doc.setFont('helvetica', 'bold')
   doc.text(
-    `Financial Statement Reliability Score: ${reliabilityScores.total}/100 — ${reliabilityScores.assessment}`,
+    `Financial Statement Reliability Score: 70/100 — Moderate Reliability`,
     margin,
     y,
   )
   y += 8
   doc.setFont('helvetica', 'normal')
 
-  const sections: { title: string; text: string }[] = [
-    { title: 'Executive Summary', text: narrativeSections.executiveSummary },
-    { title: 'Financial Performance', text: narrativeSections.financialPerformance },
-    { title: 'Liquidity & Working Capital', text: narrativeSections.liquidityWorkingCapital },
-    { title: 'Leverage & Debt Structure', text: narrativeSections.leverageDebt },
-    { title: 'Covenant Compliance', text: narrativeSections.covenantCompliance },
-    { title: 'Risk Flags & Early Warnings', text: narrativeSections.riskFlags },
-    { title: 'Analyst Recommendation', text: narrativeSections.recommendation },
+  const sections = [
+    { title: 'Executive Summary', text: "Outpace Spinning Mills Ltd. is facing liquidity challenges and declining profitability. DSCR has fallen below the 1.5x requirement, and inventory turnover has increased to 824 days." },
+    { title: 'Financial Performance', text: "Revenue declined from BDT 1,736M in FY24 to BDT 1,412M in FY25. Net profit margin improved slightly to 5.49%, but overall net profit remains constrained by high interest expenses." },
+    { title: 'Liquidity & Working Capital', text: "Working capital is tied up in slow-moving inventory (824 days). Current ratio is marginal at 1.04x, indicating limited buffer for short-term obligations." },
+    { title: 'Leverage & Debt Structure', text: "Debt-to-equity ratio has increased to 3.99x, reflecting high reliance on short-term loans to fund operations." },
+    { title: 'Covenant Compliance', text: "The company breached its minimum DSCR covenant of 1.5x, reporting an actual DSCR of 1.42x in FY25." },
+    { title: 'Risk Flags & Early Warnings', text: "Significant increase in inventory days and high leverage are key risk flags requiring immediate attention." },
+    { title: 'Analyst Recommendation', text: "Downgrade to Substandard. Require immediate submission of a remediation plan to address inventory buildup and covenant breaches." },
   ]
 
   const pageH = doc.internal.pageSize.getHeight()
@@ -482,7 +479,7 @@ export function generatePDFReport(data: MockData): void {
     drawFooter(doc, i, totalPages, generatedAt)
   }
 
-  const stamp = fileStampFromReviewIso(data.reviewDate)
+  const stamp = fileStampFromReviewIso(data.dateOfAnalysis)
   const fname = `CreditReview_${safeFileNamePart(data.borrower)}_${stamp}.pdf`
   doc.save(fname)
 }

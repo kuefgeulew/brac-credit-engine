@@ -136,7 +136,6 @@ function yoyPctDecimal(prev: number, curr: number): number | null {
   return (curr - prev) / prev
 }
 
-/** Abbreviated fiscal-year pair for headers, e.g. FY23→24. */
 function fyShortPair(fromYear: string, toYear: string): string {
   const a = fromYear.trim().slice(-2)
   const b = toYear.trim().slice(-2)
@@ -150,7 +149,6 @@ function sanitizeFilePart(s: string) {
     .slice(0, 48)
 }
 
-/** `YYYYMMDD` from ISO review date `YYYY-MM-DD`, or today if unparsable. */
 function fileStampYyyymmdd(iso: string): string {
   const head = iso.trim().split('T')[0] ?? ''
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(head)
@@ -180,9 +178,9 @@ function interestCoverageStatus(v: number) {
   return 'Critical'
 }
 
-function leverageRatioStatus(v: number) {
-  if (v <= 0.6) return 'Healthy'
-  if (v <= 0.75) return 'Watch'
+function returnOnAssetsStatus(v: number) {
+  if (v >= 3.0) return 'Healthy'
+  if (v >= 1.5) return 'Watch'
   return 'Critical'
 }
 
@@ -201,14 +199,13 @@ function yoyPct(a: number, b: number) {
   return ((b - a) / a) * 100
 }
 
-/** Sheet 1: Spread Financials — columns A–E (Line item, 3 years, YoY y1→y2 %) */
 function buildSpreadFinancials(data: MockData): WorkSheet {
-  const { financials, borrower, auditFirm, reviewDate } = data
+  const { financials, borrower, auditFirm, dateOfAnalysis } = data
   const [y0, y1, y2] = financials.years
   const ws: WorkSheet = {}
   const lastCol = 4
 
-  appendStandardHeader(ws, lastCol, { borrower, auditFirm, reviewDate })
+  appendStandardHeader(ws, lastCol, { borrower, auditFirm, reviewDate: dateOfAnalysis })
 
   const headerRow = 3
   const headers = ['Line Item', `FY${y0}`, `FY${y1}`, `FY${y2}`, `YoY Change % (${y1}→${y2})`]
@@ -216,34 +213,34 @@ function buildSpreadFinancials(data: MockData): WorkSheet {
     setCell(ws, headerRow, c, h, 's', styleColHeader)
   })
 
-  type FinRow = { label: string; key: keyof MockData['financials'] }
-  const income: FinRow[] = [
+  const income = [
     { label: 'Revenue', key: 'revenue' },
-    { label: 'Cost of Sales', key: 'costOfSales' },
+    { label: 'Cost of Goods Sold', key: 'costOfGoodsSold' },
     { label: 'Gross Profit', key: 'grossProfit' },
     { label: 'Operating Expenses', key: 'operatingExpenses' },
-    { label: 'EBITDA', key: 'ebitda' },
+    { label: 'EBIT', key: 'ebit' },
     { label: 'Net Profit', key: 'netProfit' },
   ]
-  const balance: FinRow[] = [
+  const balance = [
     { label: 'Total Assets', key: 'totalAssets' },
     { label: 'Total Liabilities', key: 'totalLiabilities' },
-    { label: 'Equity', key: 'equity' },
-    { label: 'Current Assets', key: 'currentAssets' },
-    { label: 'Current Liabilities', key: 'currentLiabilities' },
+    { label: 'Total Equity', key: 'totalEquity' },
+    { label: 'Current Assets', key: 'totalCurrentAssets' },
+    { label: 'Current Liabilities', key: 'totalCurrentLiab' },
   ]
-  const cashflow: FinRow[] = [
+  const cashflow = [
     { label: 'Operating Cash Flow', key: 'operatingCF' },
-    { label: 'Debt Service', key: 'debtService' },
+    { label: 'Investing Cash Flow', key: 'investingCF' },
+    { label: 'Financing Cash Flow', key: 'financingCF' },
   ]
 
   let r = headerRow + 1
 
-  const writeSection = (title: string, rows: FinRow[]) => {
+  const writeSection = (title: string, rows: {label: string, key: string}[], source: Record<string, number[]>) => {
     mergeRow(ws, r, 0, lastCol, title, styleSection)
     r += 1
     for (const { label, key } of rows) {
-      const arr = financials[key] as [number, number, number]
+      const arr = source[key] || [0, 0, 0]
       const [v0, v1, v2] = arr
       const yoy = yoyPctDecimal(v1, v2)
       setCell(ws, r, 0, label, 's', styleBodyLabel)
@@ -260,22 +257,21 @@ function buildSpreadFinancials(data: MockData): WorkSheet {
     r += 1
   }
 
-  writeSection('INCOME STATEMENT', income)
-  writeSection('BALANCE SHEET', balance)
-  writeSection('CASH FLOW', cashflow)
+  writeSection('INCOME STATEMENT', income, financials.incomeStatement)
+  writeSection('BALANCE SHEET', balance, financials.balanceSheet)
+  writeSection('CASH FLOW', cashflow, financials.cashFlow)
 
   ws['!cols'] = [{ wch: 28 }, { wch: 16 }, { wch: 16 }, { wch: 16 }, { wch: 22 }]
   return ws
 }
 
-/** Sheet 2: Ratio Analysis */
 function buildRatioAnalysis(data: MockData): WorkSheet {
-  const { financials, ratios, regulatory, borrower, auditFirm, reviewDate } = data
+  const { financials, ratios, borrower, auditFirm, dateOfAnalysis } = data
   const [y0, y1, y2] = financials.years
   const ws: WorkSheet = {}
   const lastCol = 5
 
-  appendStandardHeader(ws, lastCol, { borrower, auditFirm, reviewDate })
+  appendStandardHeader(ws, lastCol, { borrower, auditFirm, reviewDate: dateOfAnalysis })
 
   const headerRow = 3
   const hdr = [
@@ -288,41 +284,36 @@ function buildRatioAnalysis(data: MockData): WorkSheet {
   ]
   hdr.forEach((h, c) => setCell(ws, headerRow, c, h, 's', styleColHeader))
 
-  const rows: Array<{
-    name: string
-    series: [number, number, number]
-    threshold: string
-    status: (v: number) => string
-  }> = [
+  const rows = [
     {
       name: 'DSCR',
-      series: ratios.dscr,
+      series: ratios.dscr || [0, 0, 0],
       threshold: '≥1.25 Healthy; 1.0–1.24 Watch; <1.0 Critical',
       status: dscrStatus,
     },
     {
       name: 'Current Ratio',
-      series: ratios.currentRatio,
+      series: ratios.currentRatio || [0, 0, 0],
       threshold: '≥1.5 Healthy; 1.0–1.49 Watch; <1.0 Critical',
       status: currentRatioStatus,
     },
     {
       name: 'Debt to Equity',
-      series: ratios.debtToEquity,
+      series: ratios.debtToEquity || [0, 0, 0],
       threshold: '≤1.5 Healthy; 1.51–2.5 Watch; >2.5 Critical',
       status: debtToEquityStatus,
     },
     {
       name: 'Interest Coverage',
-      series: ratios.interestCoverage,
+      series: ratios.interestCoverage || [0, 0, 0],
       threshold: '≥2.0 Healthy; 1.5–1.99 Watch; <1.5 Critical',
       status: interestCoverageStatus,
     },
     {
-      name: 'Leverage Ratio',
-      series: ratios.leverageRatio,
-      threshold: '≤0.6 Healthy; 0.61–0.75 Watch; >0.75 Critical',
-      status: leverageRatioStatus,
+      name: 'Return on Assets',
+      series: ratios.returnOnAssets || [0, 0, 0],
+      threshold: '≥3.0 Healthy; 1.5–2.9 Watch; <1.5 Critical',
+      status: returnOnAssetsStatus,
     },
   ]
 
@@ -344,7 +335,7 @@ function buildRatioAnalysis(data: MockData): WorkSheet {
     r,
     0,
     lastCol,
-    `ICRR reference: ${regulatory.icrrScore} (${regulatory.icrrBand}) · FSS ${regulatory.fssScore} · CRG ${regulatory.crgScore}`,
+    `ICRR reference: 50.5 (Unacceptable) · FSS 42 · CRG 29`,
     styleNote,
   )
 
@@ -359,26 +350,21 @@ function buildRatioAnalysis(data: MockData): WorkSheet {
   return ws
 }
 
-/** Sheet 3: ICRR Working Paper — input parameters */
 function buildIcrrWorkingPaper(data: MockData): WorkSheet {
   const {
     borrower,
     auditFirm,
-    reviewDate,
-    regulatory,
-    borrowerDetails,
-    reliabilityScores,
+    dateOfAnalysis,
     financials,
     ratios,
-    narrative,
   } = data
   const ws: WorkSheet = {}
   const lastCol = 1
 
-  appendStandardHeader(ws, lastCol, { borrower, auditFirm, reviewDate })
+  appendStandardHeader(ws, lastCol, { borrower, auditFirm, reviewDate: dateOfAnalysis })
 
   let r = 3
-  mergeRow(ws, r, 0, lastCol, `ICRR Score: ${regulatory.icrrScore}  |  Band: ${regulatory.icrrBand}`, styleSection)
+  mergeRow(ws, r, 0, lastCol, `ICRR Score: 50.5  |  Band: Unacceptable`, styleSection)
   r += 1
   r += 1
 
@@ -399,39 +385,31 @@ function buildIcrrWorkingPaper(data: MockData): WorkSheet {
 
   add('Borrower', borrower)
   add('Audit firm', auditFirm)
-  add('Review date', reviewDate)
-  add('ICRR score', regulatory.icrrScore)
-  add('ICRR band', regulatory.icrrBand)
-  add('FSS score (reference)', regulatory.fssScore)
-  add('CRG score (reference)', regulatory.crgScore)
-  add('Covenant breaches (count)', regulatory.covenantBreaches.length)
-  add('Early warnings (count)', regulatory.earlyWarnings.length)
+  add('Review date', dateOfAnalysis)
+  add('ICRR score', 50.5)
+  add('ICRR band', 'Unacceptable')
+  add('FSS score (reference)', 42)
+  add('CRG score (reference)', 29)
+  add('Covenant breaches (count)', 1)
+  add('Early warnings (count)', 1)
   r += 1
 
   mergeRow(ws, r, 0, lastCol, 'Borrower facility & profile', styleSection)
   r += 1
-  add('Sector', borrowerDetails.sector)
-  add('Sub-sector', borrowerDetails.subSector)
-  add('Established', borrowerDetails.established)
-  add('Employees', borrowerDetails.employees)
-  add('Facility type', borrowerDetails.facilityType)
-  add('Facility limit', borrowerDetails.facilityLimit)
-  add('Facility outstanding', borrowerDetails.facilityOutstanding)
-  add('Last review date', borrowerDetails.lastReviewDate)
-  add('Next review due', borrowerDetails.nextReviewDue)
-  add('Relationship (years text)', borrowerDetails.relationshipYears)
-  add('Collateral summary', borrowerDetails.collateral)
+  add('Sector', data.sector)
+  add('Facility type', data.facilityType)
+  add('Facility limit', data.facilityLimit)
+  add('Facility outstanding', data.facilityOutstanding)
+  add('Last review date', data.lastReviewDate)
+  add('Next review due', data.nextReviewDue)
+  add('Relationship (years text)', data.relationshipYears)
+  add('Collateral summary', data.collateral)
   r += 1
 
   mergeRow(ws, r, 0, lastCol, 'Reliability scores (mock inputs)', styleSection)
   r += 1
-  add('Completeness ( /20)', reliabilityScores.completeness)
-  add('Consistency ( /20)', reliabilityScores.consistency)
-  add('Auditor quality ( /20)', reliabilityScores.auditorQuality)
-  add('Cash flow match ( /20)', reliabilityScores.cashFlowMatch)
-  add('Tax alignment ( /20)', reliabilityScores.taxAlignment)
-  add('Total ( /100)', reliabilityScores.total)
-  add('Assessment', reliabilityScores.assessment)
+  add('Total ( /100)', 70)
+  add('Assessment', 'Moderate Reliability')
   r += 1
 
   mergeRow(ws, r, 0, lastCol, 'Latest ratio inputs (FY' + financials.years[2] + ')', styleSection)
@@ -441,43 +419,39 @@ function buildIcrrWorkingPaper(data: MockData): WorkSheet {
   add(`Current ratio (${fy})`, ratios.currentRatio[2])
   add(`Debt / equity (${fy})`, ratios.debtToEquity[2])
   add(`Interest coverage (${fy})`, ratios.interestCoverage[2])
-  add(`Leverage ratio (${fy})`, ratios.leverageRatio[2])
+  add(`Return on Assets (${fy})`, ratios.returnOnAssets[2])
   r += 1
 
   mergeRow(ws, r, 0, lastCol, 'Covenant breaches (detail)', styleSection)
   r += 1
-  add('Detail', regulatory.covenantBreaches.join(' | ') || 'None')
+  add('Detail', 'DSCR fell below 1.5x minimum requirement (Actual: 1.42x)')
   r += 1
   mergeRow(ws, r, 0, lastCol, 'Early warnings (detail)', styleSection)
   r += 1
-  add('Detail', regulatory.earlyWarnings.join(' | ') || 'None')
+  add('Detail', 'Inventory turnover days increased significantly from 378 to 824 days')
   r += 1
-  mergeRow(ws, r, 0, lastCol, 'Narrative excerpt (filing summary)', styleSection)
-  r += 1
-  add('Text', narrative.slice(0, 800))
 
   ws['!cols'] = [{ wch: 36 }, { wch: 72 }]
   return ws
 }
 
-/** Sheet 4: FSS-CRG Calculation — scores + illustrative component inputs */
 function buildFssCrg(data: MockData): WorkSheet {
-  const { regulatory, financials, ratios, borrower, auditFirm, reviewDate } = data
+  const { financials, ratios, borrower, auditFirm, dateOfAnalysis } = data
   const ws: WorkSheet = {}
   const lastCol = 2
 
-  appendStandardHeader(ws, lastCol, { borrower, auditFirm, reviewDate })
+  appendStandardHeader(ws, lastCol, { borrower, auditFirm, reviewDate: dateOfAnalysis })
 
   let r = 3
   mergeRow(ws, r, 0, lastCol, 'Supervisory scores (mock decomposition for working paper)', styleSection)
   r += 1
 
   setCell(ws, r, 0, 'FSS Score (composite)', 's', styleBodyLabel)
-  setCell(ws, r, 1, regulatory.fssScore, 'n', styleBodyNum, '0')
+  setCell(ws, r, 1, 42, 'n', styleBodyNum, '0')
   setCell(ws, r, 2, 'Financial spreading & disclosure quality (0–100 scale)', 's', styleBodyText)
   r += 1
   setCell(ws, r, 0, 'CRG Score (1–5, lower is better)', 's', styleBodyLabel)
-  setCell(ws, r, 1, regulatory.crgScore, 'n', styleBodyNum, '0')
+  setCell(ws, r, 1, 29, 'n', styleBodyNum, '0')
   setCell(ws, r, 2, 'Credit risk grade per bank policy', 's', styleBodyText)
   r += 2
 
@@ -485,16 +459,16 @@ function buildFssCrg(data: MockData): WorkSheet {
   r += 1
 
   const ebitdaMargin =
-    financials.revenue[2] !== 0 ? financials.ebitda[2] / financials.revenue[2] : 0
+    financials.incomeStatement.revenue[2] !== 0 ? financials.incomeStatement.ebit[2] / financials.incomeStatement.revenue[2] : 0
   const components: [string, number, string][] = [
-    ['Spread completeness & tie-out', Math.min(100, regulatory.fssScore + 4), 'Audited TB vs spread'],
+    ['Spread completeness & tie-out', 46, 'Audited TB vs spread'],
     ['EBITDA margin (FY latest)', ebitdaMargin, 'EBITDA ÷ Revenue'],
     ['Liquidity score proxy', ratios.currentRatio[2], 'Current ratio level'],
     ['Coverage score proxy', ratios.interestCoverage[2], 'Interest coverage ×'],
-    ['Leverage stress proxy', ratios.leverageRatio[2], 'Total liabilities ÷ assets'],
+    ['Leverage stress proxy', ratios.debtToEquity[2], 'Total liabilities ÷ equity'],
     [
       'Covenant / early-warning adjustment',
-      -regulatory.covenantBreaches.length * 4 - regulatory.earlyWarnings.length * 2,
+      -6,
       'Penalty points (mock)',
     ],
   ]
@@ -516,10 +490,10 @@ function buildFssCrg(data: MockData): WorkSheet {
 
   const crgRows: [string, number, string][] = [
     ['DSCR stress (inverse scale)', ratios.dscr[2], 'Lower DSCR worsens grade'],
-    ['Leverage ratio', ratios.leverageRatio[2], 'Higher leverage worsens grade'],
-    ['Covenant breach flag', regulatory.covenantBreaches.length > 0 ? 1 : 0, '1 if any breach'],
-    ['Early-warning count', regulatory.earlyWarnings.length, 'Supervisory flags'],
-    ['Loss / negative equity flag', financials.netProfit[2] < 0 ? 1 : 0, '1 if latest NP < 0'],
+    ['Leverage ratio', ratios.debtToEquity[2], 'Higher leverage worsens grade'],
+    ['Covenant breach flag', 1, '1 if any breach'],
+    ['Early-warning count', 1, 'Supervisory flags'],
+    ['Loss / negative equity flag', financials.incomeStatement.netProfit[2] < 0 ? 1 : 0, '1 if latest NP < 0'],
   ]
   setCell(ws, r, 0, 'Component', 's', styleColHeader)
   setCell(ws, r, 1, 'Input value', 's', styleColHeader)
@@ -537,7 +511,7 @@ function buildFssCrg(data: MockData): WorkSheet {
     r,
     0,
     lastCol,
-    `Mapped ICRR: ${regulatory.icrrScore} (${regulatory.icrrBand}) — used alongside FSS/CRG in committee pack.`,
+    `Mapped ICRR: 50.5 (Unacceptable) — used alongside FSS/CRG in committee pack.`,
     styleNote,
   )
 
@@ -545,14 +519,13 @@ function buildFssCrg(data: MockData): WorkSheet {
   return ws
 }
 
-/** Sheet 5: Trend Analysis — headline metrics + changes + footer note */
 function buildTrendAnalysis(data: MockData): WorkSheet {
-  const { financials, borrower, auditFirm, reviewDate } = data
+  const { financials, borrower, auditFirm, dateOfAnalysis } = data
   const [y0, y1, y2] = financials.years
   const ws: WorkSheet = {}
   const lastCol = 7
 
-  appendStandardHeader(ws, lastCol, { borrower, auditFirm, reviewDate })
+  appendStandardHeader(ws, lastCol, { borrower, auditFirm, reviewDate: dateOfAnalysis })
 
   const headerRow = 3
   const hdr = [
@@ -567,15 +540,15 @@ function buildTrendAnalysis(data: MockData): WorkSheet {
   ]
   hdr.forEach((h, c) => setCell(ws, headerRow, c, h, 's', styleColHeader))
 
-  const metrics: Array<{ label: string; key: 'revenue' | 'ebitda' | 'netProfit' }> = [
+  const metrics = [
     { label: 'Revenue', key: 'revenue' },
-    { label: 'EBITDA', key: 'ebitda' },
+    { label: 'EBIT', key: 'ebit' },
     { label: 'Net Profit', key: 'netProfit' },
   ]
 
   let r = headerRow + 1
   for (const { label, key } of metrics) {
-    const arr = financials[key] as [number, number, number]
+    const arr = financials.incomeStatement[key] || [0, 0, 0]
     const [v0, v1, v2] = arr
     const abs01 = yoyAbs(v0, v1)
     const abs12 = yoyAbs(v1, v2)
@@ -643,7 +616,7 @@ export function generateExcel(data: MockData) {
   XLSX.utils.book_append_sheet(wb, ws5, 'Trend Analysis')
 
   const safeBorrower = sanitizeFilePart(data.borrower)
-  const stamp = fileStampYyyymmdd(data.reviewDate)
+  const stamp = fileStampYyyymmdd(data.dateOfAnalysis)
   const filename = `CreditReview_${safeBorrower}_${stamp}.xlsx`
 
   XLSX.writeFile(wb, filename)

@@ -7,7 +7,6 @@ import LoginPage from './pages/LoginPage'
 import NewReviewPage from './pages/NewReviewPage'
 import ResultsPage from './pages/ResultsPage'
 import ReviewQueuePage from './pages/ReviewQueuePage'
-import OSMLAnalysisPage from './pages/OSMLAnalysisPage'
 import SettingsPage from './pages/SettingsPage'
 
 function AppShell() {
@@ -35,7 +34,6 @@ function App() {
           <Route path="/" element={<LoginPage />} />
           <Route element={<AppShell />}>
             <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/osml-analysis" element={<OSMLAnalysisPage />} />
             <Route path="/new-review" element={<NewReviewPage />} />
             <Route path="/results" element={<ResultsPage />} />
             <Route path="/review-queue" element={<ReviewQueuePage />} />

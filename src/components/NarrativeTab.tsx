@@ -1,7 +1,6 @@
 import { Copy, Sparkles } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import type { MockData } from '../types/mockData'
 import Toast from './Toast'
 
 const SEGMENT_FIELDS = [
@@ -12,14 +11,29 @@ const SEGMENT_FIELDS = [
   { field: 'taxAlignment' as const, label: 'Tax Alignment' },
 ] as const
 
-function assessmentTone(total: number) {
-  if (total >= 75) return { tone: 'green' as const }
-  if (total >= 60) return { tone: 'amber' as const }
-  return { tone: 'red' as const }
+const OSML_NARRATIVE = {
+  narrativeSections: {
+    executiveSummary: "Outpace Spinning Mills Ltd. (OSML), a Private Limited Company under the Outright Group, is engaged in textile manufacturing (Industry Code 102). The company maintains a Standard CIB status with no adverse classification in the preceding three years. The ICRR aggregate score stands at 50.5/100 (Unacceptable) driven by weak quantitative performance, while the CRG score is 29/60 (Substandard, 48.3%), placing the borrower under heightened regulatory scrutiny.",
+    financialPerformance: "Revenue declined from BDT 1,736.1M in FY2024 to BDT 1,412.8M in FY2025, a contraction of 18.6%, following a period of strong growth in FY2024. Net profit improved marginally by 11.5% to BDT 77.6M in FY2025, supported by a reduction in interest expenses from BDT 118.8M to BDT 80.3M. EBITDA margin remained under pressure at 13.8% in FY2025, down from 16.2% in FY2023, reflecting structural cost absorption challenges in the textile sector.",
+    liquidityWorkingCapital: "The current ratio of 1.041× in FY2025 indicates a thin liquidity buffer with current assets marginally covering current liabilities. The cash ratio of 0.006 is critically low, suggesting near-zero cash reserves relative to short-term obligations. Stock Turnover Days worsened sharply to 824 days in FY2025 from 378 days in FY2024, indicating significant inventory accumulation that may reflect sales slowdown or procurement-cycle mismanagement.",
+    leverageDebt: "Total financial debt grew from BDT 2,050M in FY2023 to BDT 3,135M in FY2025, representing a 52.9% increase over three years. The Debt-to-Equity ratio has deteriorated continuously: 3.51× (FY2023) → 3.71× (FY2024) → 3.99× (FY2025), indicating increasing leverage with no sign of deleveraging. Long-term loan exposure declined from BDT 157.9M to BDT 128.7M, but short-term borrowing increased substantially to BDT 2,949M, raising rollover risk concerns.",
+    covenantCompliance: "No formal covenant breaches have been recorded in the current review period. The DSCR of 1.42× in FY2025 satisfies the minimum threshold of 1.0×, though the declining trend from 1.71× in FY2023 warrants continuous monitoring. Interest coverage at 2.16× remains above the 1.5× minimum, providing a modest but adequate buffer. Operating cash flow turned positive in FY2025 at BDT 105.2M after a severe outflow of BDT (723.2M) in FY2023, representing a meaningful recovery.",
+    riskFlags: "The primary risk concern is the dramatic increase in stock turnover days to 824 days, suggesting inventory financing risk of significant magnitude. The near-zero cash ratio and high short-term borrowing concentration create refinancing vulnerability. Financial Debt to Operating Cash Flow at 29.8× far exceeds the 3× comfort threshold, indicating that current cash generation is insufficient to service the debt load within a reasonable timeframe. The unaudited nature of the financial statements, prepared by a non-BSEC-listed firm, introduces additional reliability risk.",
+    recommendation: "Given the Substandard CRG grade and Unacceptable ICRR score driven by quantitative weakness, the analyst recommends conditional renewal of existing facilities subject to: (i) submission of audited FY2025 financial statements from a BSEC-recognized audit firm within 90 days; (ii) a credible inventory liquidation plan with quarterly milestones; (iii) enhanced primary collateral coverage to a minimum of 50% of facility value; and (iv) mandatory monthly account monitoring with early warning triggers. Facility enhancement or new exposure is not recommended at the current risk grade."
+  },
+  reliabilityScores: {
+    completeness: 15,
+    consistency: 14,
+    auditorQuality: 8,
+    cashFlowMatch: 13,
+    taxAlignment: 12,
+    total: 62,
+    assessment: "Moderate Reliability"
+  }
 }
 
-function buildFullNarrativeText(data: MockData) {
-  const ns = data.narrativeSections
+function buildFullNarrativeText() {
+  const ns = OSML_NARRATIVE.narrativeSections
   const sections = [
     ns.executiveSummary,
     ns.financialPerformance,
@@ -29,7 +43,7 @@ function buildFullNarrativeText(data: MockData) {
     ns.riskFlags,
     ns.recommendation,
   ].join('\n\n')
-  return `${sections}\n\n---\n\n${data.narrative}`
+  return sections
 }
 
 function countWords(s: string) {
@@ -39,7 +53,6 @@ function countWords(s: string) {
     .filter((w) => w.length > 0).length
 }
 
-/** Minutes from word count ÷ 200, rounded up to nearest 0.5. */
 function estimateReadMinutesFromWords(words: number) {
   if (words <= 0) return 0
   return Math.ceil((words / 200) * 2) / 2
@@ -51,11 +64,7 @@ function formatReadMinutes(m: number) {
   return `${m.toFixed(1)} min`
 }
 
-export default function NarrativeTab({
-  mockData,
-}: {
-  mockData: MockData
-}) {
+export default function NarrativeTab() {
   const [toastOpen, setToastOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -63,14 +72,10 @@ export default function NarrativeTab({
     setToastOpen(false)
     setIsSubmitting(false)
   }, [])
-  const { narrative, narrativeSections, reliabilityScores } = mockData
+  
+  const { narrativeSections, reliabilityScores } = OSML_NARRATIVE
 
-  const band = useMemo(
-    () => assessmentTone(reliabilityScores.total),
-    [reliabilityScores.total],
-  )
-
-  const fullNarrativeText = useMemo(() => buildFullNarrativeText(mockData), [mockData])
+  const fullNarrativeText = useMemo(() => buildFullNarrativeText(), [])
   const wordCount = useMemo(() => countWords(fullNarrativeText), [fullNarrativeText])
   const characterCount = fullNarrativeText.length
   const readMinutes = useMemo(() => estimateReadMinutesFromWords(wordCount), [wordCount])
@@ -106,17 +111,10 @@ export default function NarrativeTab({
     }
   }, [fullNarrativeText])
 
-  const bannerClass =
-    band.tone === 'green'
-      ? 'border-[#BBF7D0] bg-[#F0FDF4]'
-      : band.tone === 'amber'
-        ? 'border-[#FDE68A] bg-[#FFFBEB]'
-        : 'border-[#FECACA] bg-[#FEF2F2]'
-
   return (
     <div className="space-y-6 pb-6">
       <section
-        className={`flex flex-col gap-6 rounded-xl border-2 px-7 py-5 print:hidden lg:flex-row lg:items-center lg:justify-between ${bannerClass}`}
+        className="flex flex-col gap-6 rounded-xl border-2 px-7 py-5 print:hidden lg:flex-row lg:items-center lg:justify-between border-[#FCD34D] bg-[#FFFBEB]"
       >
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-text-secondary">
@@ -126,6 +124,9 @@ export default function NarrativeTab({
             {reliabilityScores.total} / 100
           </p>
           <p className="mt-2 text-sm font-semibold text-text-primary">{reliabilityScores.assessment}</p>
+          <p className="mt-1 text-xs text-text-secondary max-w-sm">
+            Unaudited statements prepared by Dewan Nazrul Islam & Co. — not BSEC listed.
+          </p>
         </div>
         <div className="grid w-full max-w-xl grid-cols-1 gap-3 sm:grid-cols-5 lg:max-w-2xl">
           {SEGMENT_FIELDS.map(({ field, label }) => {
@@ -164,10 +165,10 @@ export default function NarrativeTab({
                 </h2>
               </div>
               <p className="text-xs text-text-secondary">
-                Review, edit, and approve before submission
+                Outpace Spinning Mills Ltd. — Review Date: 26 December 2024 — Financials as at: 30 June 2024
               </p>
             </div>
-            <MemoBody narrativeSections={narrativeSections} narrative={narrative} />
+            <MemoBody narrativeSections={narrativeSections} />
           </div>
 
           <div className="sticky bottom-0 z-20 flex flex-col gap-3 border-t border-border bg-card-white/95 px-4 py-4 backdrop-blur-sm print:hidden sm:flex-row sm:justify-end">
@@ -218,7 +219,7 @@ export default function NarrativeTab({
       <div className="narrative-tab-print-only hidden border border-border bg-card-white p-5 text-sm text-text-primary print:block">
         <h3 className="text-sm font-bold text-text-primary">AI narrative (print)</h3>
         <p className="mt-1 text-xs text-text-secondary">
-          {mockData.borrower} · Reliability {reliabilityScores.total}/100 ({reliabilityScores.assessment})
+          Outpace Spinning Mills Ltd. · Reliability {reliabilityScores.total}/100 ({reliabilityScores.assessment})
         </p>
         <div className="mt-4 space-y-4 text-xs leading-relaxed">
           <div>
@@ -249,16 +250,12 @@ export default function NarrativeTab({
             <p className="font-bold text-text-primary">7. Recommendation</p>
             <p className="mt-1 whitespace-pre-line text-text-secondary">{narrativeSections.recommendation}</p>
           </div>
-          <div className="border-t border-border pt-3">
-            <p className="font-bold text-text-primary">Source narrative</p>
-            <p className="mt-1 whitespace-pre-line text-text-secondary">{narrative}</p>
-          </div>
         </div>
       </div>
 
       <Toast
         open={toastOpen}
-        message="Review approved and submitted to credit committee"
+        message="Review memo submitted to credit committee"
         onClose={closeToast}
       />
     </div>
@@ -275,8 +272,8 @@ function Section({
   children: ReactNode
 }) {
   return (
-    <div className="border-t border-border pt-6 first:border-t-0 first:pt-0">
-      <h3 className="text-sm font-bold text-primary">
+    <div className="border-t border-[#D0DCF0] pt-6 first:border-t-0 first:pt-0">
+      <h3 className="text-sm font-bold text-[#0052A5]">
         {n}. {title}
       </h3>
       <div className="mt-3 space-y-2 text-sm leading-relaxed text-text-primary">{children}</div>
@@ -292,13 +289,11 @@ function SectionText({ text }: { text: string }) {
 
 function MemoBody({
   narrativeSections,
-  narrative,
 }: {
-  narrativeSections: MockData['narrativeSections']
-  narrative: string
+  narrativeSections: typeof OSML_NARRATIVE.narrativeSections
 }) {
   return (
-    <div className="space-y-2">
+    <div className="space-y-6">
       <Section n={1} title="Executive Summary">
         <SectionText text={narrativeSections.executiveSummary} />
       </Section>
@@ -326,15 +321,6 @@ function MemoBody({
       <Section n={7} title="Analyst Recommendation">
         <SectionText text={narrativeSections.recommendation} />
       </Section>
-
-      <div className="border-t border-border pt-6">
-        <h3 className="text-xs font-bold uppercase tracking-wide text-text-secondary">
-          Source narrative (filing summary)
-        </h3>
-        <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-text-secondary">
-          {narrative}
-        </p>
-      </div>
     </div>
   )
 }
